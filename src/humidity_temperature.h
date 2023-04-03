@@ -1,9 +1,7 @@
 #pragma once
-#include <stdint.h>
 #include <stdbool.h>
-
+#include <stdint.h>
 
 bool hum_temp_init();
-void hum_measure(uint16_t * buffer);
-void temp_measure(uint16_t * buffer);
+bool hum_temp_measure(uint16_t *hume_buffer, uint16_t *temp_buffer);
 void hum_temp_destroy();
