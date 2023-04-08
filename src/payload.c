@@ -1,6 +1,8 @@
 #include "payload.h"
 #include <stdlib.h>
 
+#define ACTION_WATER_ON (1 << 7)
+
 payload_id_t payload_get_id(uint8_t *data)
 {
     return (payload_id_t)((data[0] >> 2) & 0x3F);
@@ -71,4 +73,16 @@ void payload_unpack_thc_presets(uint8_t *data, range_t *temperature_range, range
 
 void payload_unpack_intervals(uint8_t *data, interval_t *intervals, uint8_t *no_intervals) {}
 
-void payload_unpack_actions(uint8_t *data, action_t *actions) {}
+void payload_unpack_actions(uint8_t *data, action_t *actions)
+{
+    uint8_t action_byte = 0;
+
+    action_byte |= (data[0] & 0x3);
+    action_byte |= ((data[1] >> 2) & 0x3F);
+
+    if (action_byte & ACTION_WATER_ON)
+    {
+        actions->water_on = true;
+        // TODO: save the duration of water on
+    }
+}
