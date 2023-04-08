@@ -274,6 +274,9 @@
     <Compile Include="freeRTOS\src\variantHooks.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="inc\payload.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\LoRaWANHandler.c">
       <SubType>compile</SubType>
     </Compile>
