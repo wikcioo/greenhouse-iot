@@ -1,6 +1,6 @@
 [submodule "drivers"]
-	path = drivers
+	path = submodules/drivers
 	url = https://github.com/ihavn/IoT_Semester_project.git
 [submodule "freeRTOS"]
-	path = freeRTOS
+	path = submodules/freeRTOS
 	url = https://github.com/ihavn/VIA_FreeRTOS_AVRMEGA.git
