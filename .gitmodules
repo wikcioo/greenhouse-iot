@@ -1,0 +1,3 @@
+[submodule "drivers"]
+	path = drivers
+	url = https://github.com/ihavn/IoT_Semester_project.git
