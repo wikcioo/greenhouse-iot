@@ -8,6 +8,7 @@ FREE_RTOS_SRC_DIR = freeRTOS/src
 DRIVERS_DIR = drivers
 FIRMWARE_INC_DIR = inc
 FIRMWARE_SRC_DIR = src
+TESTS_DIR = tests
 BUILD_DIR = build
 IOT_LIB = IotLibrary
 CPU_SPEED = 16000000L
@@ -37,6 +38,11 @@ $(BUILD_DIR)/%.o: $(FIRMWARE_SRC_DIR)/%.c
 
 flash: $(BUILD_DIR)/$(FIRMWARE_HEX)
 	avrdude -C /etc/avrdude.conf -v -p m2560 -c atmelice_isp -P usb -U flash:w:$^:i
+
+test:
+	$(CXX) $(TESTS_DIR)/*.cpp -lgtest -lpthread -o $(TESTS_DIR)/tests
+	./$(TESTS_DIR)/tests
+	rm -rf $(TESTS_DIR)/tests
 
 clean:
 	rm -rf $(BUILD_DIR) .cache/ compile_commands.json
