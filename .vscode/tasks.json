@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Clean",
+            "label": "Clean Firmware",
             "type": "shell",
             "command": "make clean",
             "group": {
@@ -11,7 +11,25 @@
             }
         },
         {
-            "label": "Build",
+            "label": "Clean Tests",
+            "type": "shell",
+            "command": "make clean_test",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Clean All",
+            "type": "shell",
+            "command": "make clean_all",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build Firmware",
             "type": "shell",
             "command": "bear -- make",
             "group": {
@@ -29,9 +47,18 @@
             }
         },
         {
-            "label": "Test",
+            "label": "Build Tests",
             "type": "shell",
-            "command": "make test",
+            "command": "bear -- make test",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "./tests/build/gtest_tests",
             "group": {
                 "kind": "build",
                 "isDefault": true
