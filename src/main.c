@@ -14,6 +14,7 @@
 #include <stdio_driver.h>
 #include <task.h>
 
+#include "humidity_temperature.h"
 // Needed for LoRaWAN
 #include <lora_driver.h>
 #include <status_leds.h>
@@ -65,6 +66,7 @@ void create_tasks_and_semaphores(void)
 /*-----------------------------------------------------------*/
 void task1(void *pvParameters)
 {
+    uint16_t         hum, temp;
     TickType_t       xLastWakeTime;
     const TickType_t xFrequency = 500 / portTICK_PERIOD_MS;  // 500 ms
 
@@ -73,8 +75,17 @@ void task1(void *pvParameters)
 
     for (;;)
     {
+        if (hum_temp_measure(&hum, &temp))
+        {
+            puts("measure is successfully read");
+            printf("hum: %u , temp: %u \n", hum, temp);
+        }
+        else
+        {
+            puts("Can't read humidity and temperature measurements");
+        }
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
-        puts("Task69420");  // stdio functions are not reentrant - Should normally be protected by MUTEX
+        puts("Task99");  // stdio functions are not reentrant - Should normally be protected by MUTEX
         PORTA ^= _BV(PA0);
     }
 }
@@ -121,6 +132,14 @@ int main(void)
 {
     initialiseSystem();  // Must be done as the very first thing!!
     printf("Program Started!!\n");
+    if (hum_temp_init())
+    {
+        puts("HIH8120 driver initialized successfully");
+    }
+    else
+    {
+        puts("HIH8120 driver failed");
+    }
     vTaskStartScheduler();  // Initialise and run the freeRTOS scheduler. Execution should never return from here.
 
     /* Replace with your application code */
