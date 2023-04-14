@@ -1,4 +1,0 @@
-{
-    "clang-format.style": "file",
-    "clang-format.executable": "${workspaceFolder}/.clang-format"
-}

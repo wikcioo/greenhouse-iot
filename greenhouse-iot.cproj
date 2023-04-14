@@ -1,0 +1,1725 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>7.0</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
+    <ProjectGuid>dce6c7e3-ee26-4d79-826b-08594b9ad897</ProjectGuid>
+    <avrdevice>ATmega2560</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>greenhouse-iot</AssemblyName>
+    <Name>greenhouse-iot</Name>
+    <RootNamespace>greenhouse-iot</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <ResetRule>0</ResetRule>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <EraseKey />
+    <AsfFrameworkConfig>
+      <framework-data xmlns="">
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.52.0" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.atmelice</avrtool>
+    <avrtoolserialnumber>J41800025992</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x1E9801</avrdeviceexpectedsignature>
+    <com_atmel_avrdbg_tool_atmelice>
+      <ToolOptions>
+        <InterfaceProperties>
+          <JtagDbgClock>200000</JtagDbgClock>
+        </InterfaceProperties>
+        <InterfaceName>JTAG</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.atmelice</ToolType>
+      <ToolNumber>J41800025992</ToolNumber>
+      <ToolName>Atmel-ICE</ToolName>
+    </com_atmel_avrdbg_tool_atmelice>
+    <avrtoolinterface>JTAG</avrtoolinterface>
+    <avrtoolinterfaceclock>200000</avrtoolinterfaceclock>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+  <avrgcc.common.Device>-mmcu=atmega2560 -B "%24(PackRepoDir)\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega2560"</avrgcc.common.Device>
+  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>NDEBUG</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.7.374\include\</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.assembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.7.374\include\</Value>
+    </ListValues>
+  </avrgcc.assembler.general.IncludePaths>
+</AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGcc>
+  <avrgcc.common.Device>-mmcu=atmega2560 -B "%24(PackRepoDir)\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega2560"</avrgcc.common.Device>
+  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>F_CPU=16000000L</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.7.374\include\</Value>
+      <Value>../inc</Value>
+      <Value>../submodules/drivers</Value>
+      <Value>../submodules/freeRTOS/src</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize debugging experience (-Og)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+      <Value>IotLibrary</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.linker.libraries.LibrarySearchPaths>
+    <ListValues>
+      <Value>../submodules/drivers</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.LibrarySearchPaths>
+  <avrgcc.assembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.7.374\include\</Value>
+    </ListValues>
+  </avrgcc.assembler.general.IncludePaths>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src\LoRaWANHandler.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\display_7seg.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="submodules\drivers\docs\example\loraWANHandler.c">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\example\main.c">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="submodules\drivers\fifo.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\FreeRTOSTraceDriver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\hcSr501.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\hih8120.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\lora_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\lora_driver_utils.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\mh_z19.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\rc_servo.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\sen14262.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\serial.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\spi_iha.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\status_leds.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\stdio_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\tsl2591.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\drivers\twi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="submodules\freeRTOS\Example\main.c">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="submodules\freeRTOS\FreeRTOSTraceDriver\FreeRTOSTraceDriver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\FreeRTOSTraceDriver\FreeRTOSTraceDriver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\ATMEGA_FreeRTOS.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\atomic.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\croutine.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\croutine.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\event_groups.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\event_groups.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\FreeRTOSConfig.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\FreeRTOSVariant.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\heap_4.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\list.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\list.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\message_buffer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\mpu_wrappers.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\port.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\portable.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\portmacro.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\projdefs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\queue.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\queue.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\semphr.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\stack_macros.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\stream_buffer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\stream_buffer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\tasks.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\timers.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\timers.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="submodules\freeRTOS\src\variantHooks.c">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="inc\" />
+    <Folder Include="src\" />
+    <Folder Include="submodules\" />
+    <Folder Include="submodules\drivers\" />
+    <Folder Include="submodules\drivers\docs\" />
+    <Folder Include="submodules\drivers\docs\documentation\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\RN2483 LoRa\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\Sensors\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\Sensors\HC-SR501 PIR\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\Sensors\HIH8000 Temp and RH Sensor\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\Sensors\MH-Z19 CO2\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\Sensors\TSL2591 Light Sensor\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\IoT Sensor Board\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\Mikro Click Host Board\" />
+    <Folder Include="submodules\drivers\docs\documentation\HW Doc\VIA MEGA2560 Shield\" />
+    <Folder Include="submodules\drivers\docs\documentation\Loriot\" />
+    <Folder Include="submodules\drivers\docs\documentation\Project_Setup\" />
+    <Folder Include="submodules\drivers\docs\driver_library\" />
+    <Folder Include="submodules\drivers\docs\example\" />
+    <Folder Include="submodules\drivers\docs\megashielddoc\" />
+    <Folder Include="submodules\drivers\docs\resources\" />
+    <Folder Include="submodules\drivers\docs\search\" />
+    <Folder Include="submodules\drivers\Example\" />
+    <Folder Include="submodules\freeRTOS\" />
+    <Folder Include="submodules\freeRTOS\Example\" />
+    <Folder Include="submodules\freeRTOS\FreeRTOSTraceDriver\" />
+    <Folder Include="submodules\freeRTOS\src\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="submodules\drivers\.git">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\.gitignore">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\DATASHEETS.md">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\annotated.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\annotated_dup.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\bc_s.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\bdwn.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\classes.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\closed.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\dir_4add8d7248e17903521621044f5370f8.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\dir_52c912f73dac9c4c0e442232e1b2bd80.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\dir_6dff7e51a7506716a97b97d6dc5c6ea1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\display_7seg_driver_quickstart.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\display__7seg_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\display__7seg_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\display__7seg_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\display__7seg_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\display__7seg_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\doc.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\RN2483 LoRa\lora-click-schematic-v104.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\Sensors\HC-SR501 PIR\PIR HC-SR501.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\Datasheets\Sensors\MH-Z19 CO2\MH-Z19 CO2 Ver1.0.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\IoT Sensor Board\Sensor connection board.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\IoT Sensor Board\Sensor connection Schematic.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\Mikro Click Host Board\Mikro Click Host Board Schematic.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\Mikro Click Host Board\Mikro Click Host Board.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\VIA MEGA2560 Shield\MCU-Pin Usage.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\VIA MEGA2560 Shield\VIA Shield 2.0.0 Board.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\HW Doc\VIA MEGA2560 Shield\VIA Shield 2.0.0 Schematic.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\Loriot\Downlink.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\Loriot\Gateway.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\Loriot\Overview.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\Loriot\Uplink.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\documentation\Project_Setup\Setup 4. Semester Project.pdf">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\doxygen.css">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\doxygen.svg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\driver_library\Iot driver Library.7z">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\driver_library\Loriot Output Data Format.7z">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\dynsections.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\example\WebsocketClient.java">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\files.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\files_dup.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\folderclosed.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\folderopen.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\functions.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\functions_vars.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\globals.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\globals_defs.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\globals_enum.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\globals_eval.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\globals_func.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\globals_type.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\graph_legend.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\graph_legend.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\graph_legend.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__display__7seg__driver__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__return__codes.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__return__codes.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__return__codes.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__hih8120__driver__return__codes.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__basic__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__basic__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__basic__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__basic__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__led__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__advanced__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__advanced__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__advanced__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__advanced__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__basic__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__basic__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__basic__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__basic__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__config.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__config.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__config.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__config.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver__return__codes.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver__return__codes.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver__return__codes.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__lora__driver__return__codes.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__advanced__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__advanced__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__advanced__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__advanced__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__basic__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__basic__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__basic__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__basic__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__driver__return__codes.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__driver__return__codes.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__driver__return__codes.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__mh__z19__driver__driver__return__codes.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__basic__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__basic__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__basic__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__basic__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__rc__servo__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__basic__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__basic__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__basic__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__basic__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sen14262__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__basic__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__basic__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__basic__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__basic__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__sr501__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__functions.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__functions.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__functions.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__stdio__driver__functions.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__basic__function.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__basic__function.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__basic__function.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__basic__function.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__creation.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__creation.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__creation.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__creation.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__return__codes.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__return__codes.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__return__codes.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__return__codes.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__structs.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__structs.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__structs.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\group__tsl2591__driver__structs.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hcsr501_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hcsr501_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hcsr501_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hcsr501_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hcsr501_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hih8120_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hih8120_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hih8120_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hih8120_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hih8120_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\hih8120_driver_quickstart.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\index.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\IoT_HAL.svg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\jquery.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\logo.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora_driver_quickstart.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora_driver_quickstart.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora_receive_downlink_message.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora_send_uplink_message.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora_setup_to__a_b_p.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora_setup_to__o_t_a_a.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora__driver_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora__driver_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora__driver_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora__driver_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\lora__driver_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\megashielddoc\Documentation.7z">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\menu.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\menudata.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\mh_z19_driver_quick_start.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\mh__z19_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\mh__z19_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\mh__z19_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\mh__z19_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\mh__z19_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\modules.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\modules.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\navtree.css">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\navtree.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\navtreedata.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\navtreeindex0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\navtreeindex1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\nav_f.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\nav_g.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\nav_h.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\open.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\pages.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\rc__servo_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\rc__servo_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\rc__servo_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\rc__servo_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\rc__servo_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\resize.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\resources\Host Board Jumper.jpg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\resources\IoT-Hardware Connections.jpg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\resources\IoT-Hardware JTAG.jpg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\resources\IoT-Hardware.jpg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\resources\logo.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_10.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_10.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_4.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_4.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_5.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_5.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_6.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_6.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_7.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_7.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_8.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_8.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_9.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_9.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_a.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_a.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_b.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_b.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_c.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_c.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_d.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_d.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_e.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_e.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_f.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\all_f.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\classes_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\classes_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\classes_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\classes_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\close.svg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\defines_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\defines_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_4.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enums_4.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\enumvalues_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_4.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_4.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_5.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_5.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_6.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\files_6.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_4.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_4.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_5.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_5.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_6.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\functions_6.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_4.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_4.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_5.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_5.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_6.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_6.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_7.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_7.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_8.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_8.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_9.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_9.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_a.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\groups_a.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\mag_sel.svg">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\nomatches.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_4.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_4.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_5.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_5.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_6.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\pages_6.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\search.css">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\search.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\searchdata.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\search_l.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\search_m.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\search_r.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\typedefs_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\typedefs_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\typedefs_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\typedefs_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_0.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_0.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_1.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_1.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_2.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_2.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_3.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_3.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_4.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_4.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_5.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\search\variables_5.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sen14262_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sen14262_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sen14262_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sen14262_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sen14262_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sen14262_driver_quick_start.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\splitbar.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sr501_driver_quick_start.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\status__leds_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\status__leds_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\status__leds_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\stdio__driver_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\stdio__driver_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\stdio__driver_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\stdio__driver_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\stdio__driver_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\structlora__driver__payload.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\structlora__driver__payload.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\structtsl2591__combined_data__t.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\structtsl2591__combined_data__t.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\svgpan.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sync_off.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\sync_on.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tabs.css">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tab_a.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tab_b.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tab_h.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tab_s.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\todo.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tsl2591_8h.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tsl2591_8h.js">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tsl2591_8h_source.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tsl2591_8h__incl.md5">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tsl2591_8h__incl.png">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\tsl2591_driver_quick_start.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\docs\_doxygen_main_page_8dox.html">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\Example\LoRaWANHandler.c.example">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\Example\main.c.example">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\Example\WebsocketClient.java.example">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\HARDWARE-DOC.md">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\libIotLibrary.a">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\LICENSE.md">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\LORA_NETWORK_SERVER.md">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\drivers\README.md">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\freeRTOS\.git">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\freeRTOS\.gitignore">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\freeRTOS\readme.md">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\freeRTOS\src\.gitignore">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\freeRTOS\src\history.txt">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="submodules\freeRTOS\src\LICENSE.md">
+      <SubType>compile</SubType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
