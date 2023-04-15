@@ -1,8 +1,7 @@
-#include <hih8120.h>
-#include <util/delay.h>
-
 #include "humidity_temperature.h"
 
+#include <hih8120.h>
+#include <util/delay.h>
 
 bool hum_temp_init()
 {
