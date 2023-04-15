@@ -1,8 +1,8 @@
+#include "humidity_temperature.h"
+
 #include <hih8120.h>
 #include <stdint.h>
 #include <util/delay.h>
-
-#include "humidity_temperature.h"
 
 uint16_t hum_last_measurement, temp_last_measurement;
 
