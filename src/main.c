@@ -68,7 +68,6 @@ void create_tasks_and_semaphores(void)
 /*-----------------------------------------------------------*/
 void task1(void *pvParameters)
 {
-    uint16_t         hum, temp;
     TickType_t       xLastWakeTime;
     const TickType_t xFrequency = 500 / portTICK_PERIOD_MS;  // 500 ms
 
@@ -77,10 +76,10 @@ void task1(void *pvParameters)
 
     for (;;)
     {
-        if (hum_temp_measure(&hum, &temp))
+        if (hum_temp_measure())
         {
             puts("measure is successfully read");
-            printf("hum: %u , temp: %u \n", hum, temp);
+            printf("hum: %u , temp: %u \n", get_last_humidity_measurement(), get_last_temperature_measurement());
         }
         else
         {
