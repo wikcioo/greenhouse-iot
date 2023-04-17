@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "co2.h"
+#include "humidity_temperature.h"
 #include "payload.h"
 
 static uint8_t *hex_str_to_u8_ptr(const char *hex_str)
@@ -27,7 +29,8 @@ payload_id_t payload_get_id(const char *hex_str)
 
 payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint8_t humidity, uint16_t co2)
 {
-    uint8_t *payload = (uint8_t *) calloc(6, sizeof(uint8_t));
+    // uint8_t *payload = (uint8_t *) calloc(6, sizeof(uint8_t));
+    static uint8_t payload[6] = {0};
 
     payload_id_t id = THC_READINGS;
     payload[0] |= ((uint8_t) id << 2);   // 1st byte += 6bits of ID
@@ -38,15 +41,16 @@ payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint8_t hu
 
     payload[2] |= ((temperature >> 1) & 0xFF);  // 3rd byte += 8bits of temperature
 
-    payload[3] |= (temperature & 0x1);  // 4th byte += 1bit of temperature
-    payload[3] |= (humidity & 0x7F);    // 4th byte += 7bits of humidity
+    payload[3] |= ((temperature & 0x1) << 7);  // 4th byte += 1bit of temperature
+    payload[3] |= (humidity & 0x7F);           // 4th byte += 7bits of humidity
 
     payload[4] |= ((co2 >> 4) & 0xFF);  // 5th byte += 8bits of co2
 
-    payload[5] |= (co2 & 0xF);  // 6th byte += 4bits of co2
+    payload[5] |= (co2 & 0xF) << 4;  // 6th byte += 4bits of co2
 
     return (payload_uplink_t){payload, 6};
 }
+
 
 void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_t *hum_range, range_t *co2_range)
 {

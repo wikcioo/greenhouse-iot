@@ -1,9 +1,10 @@
 /*
- * loraWANHandler.c
+ * LoRaWan_imp.c
  *
- * Created: 12/04/2019 10:09:05
- *  Author: IHA
+ * Created: 15/04/2023 03:14:37
+ *  Author: wael
  */
+#include <lora_driver.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -12,28 +13,34 @@
 #include <lora_driver.h>
 #include <status_leds.h>
 
-// Parameters for OTAA join - You have got these in a mail from IHA
-#define LORA_appEUI "9226119BAA2DE982"
-#define LORA_appKEY "65DE3D06F8D11CAA807EE317C60E144D"
+#define LORA_appEUI ""
+#define LORA_appKEY ""
 
-void lora_handler_task(void *pvParameters);
-
-static lora_driver_payload_t _uplink_payload;
-
-void lora_handler_initialise(UBaseType_t lora_handler_task_priority)
+void lorawan_init(serial_comPort_t comPort, bool withDownlinkMessageBuffer)
 {
-    xTaskCreate(
-        lora_handler_task, "LRHand"  // A name just for humans
-        ,
-        configMINIMAL_STACK_SIZE + 200  // This stack size can be checked & adjusted by reading the Stack Highwater
-        ,
-        NULL, lora_handler_task_priority  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being
-                                          // the lowest.
-        ,
-        NULL);
+    if (withDownlinkMessageBuffer)
+    {
+        MessageBufferHandle_t downLinkMessageBufferHandle = xMessageBufferCreate(sizeof(lora_driver_payload_t) * 2);
+        lora_driver_initialise(comPort, downLinkMessageBufferHandle);
+        puts("LoRaWan init successfully");
+    }
+    else
+    {
+        lora_driver_initialise(comPort, NULL);
+        puts("LoRaWan init successfully");
+    }
 }
-
-static void _lora_setup(void)
+// This must be done from a FreeRTOS task!!
+void loran_prepare_LoRaWan_module()
+{
+    lora_driver_resetRn2483(1);  // Activate reset line
+    vTaskDelay(2);
+    lora_driver_resetRn2483(0);  // Release reset line
+    vTaskDelay(150);             // Wait for tranceiver module to wake up after reset
+    lora_driver_flushBuffers();  // get rid of first version string from module after reset!
+    puts("LoRaWan prepared successfully");
+}
+void loran_setup_OTAA(void)
 {
     char                     _out_buf[20];
     lora_driver_returnCode_t rc;
@@ -110,47 +117,30 @@ static void _lora_setup(void)
         }
     }
 }
-
-/*-----------------------------------------------------------*/
-void lora_handler_task(void *pvParameters)
+void loran_send_uplink(uint8_t *data, uint8_t length, uint8_t portNumber)
 {
-    // Hardware reset of LoRaWAN transceiver
-    lora_driver_resetRn2483(1);
-    vTaskDelay(2);
-    lora_driver_resetRn2483(0);
-    // Give it a chance to wakeup
-    vTaskDelay(150);
-
-    lora_driver_flushBuffers();  // get rid of first version string from module after reset!
-
-    _lora_setup();
-
-    _uplink_payload.len    = 6;
-    _uplink_payload.portNo = 2;
-
-    TickType_t       xLastWakeTime;
-    const TickType_t xFrequency = pdMS_TO_TICKS(3000UL);  // Upload message every 5 minutes (300000 ms)
-    xLastWakeTime               = xTaskGetTickCount();
-
-    for (;;)
+    lora_driver_payload_t uplinkPayload;
+    uplinkPayload.len    = length;
+    uplinkPayload.portNo = portNumber;
+    for (uint8_t i = 0; i < 6; i++)
     {
-        xTaskDelayUntil(&xLastWakeTime, xFrequency);
-        puts("lorawan start");
-        // Some dummy payload
-        uint16_t hum     = 12345;  // Dummy humidity
-        int16_t  temp    = 675;    // Dummy temp
-        uint16_t co2_ppm = 1050;   // Dummy CO2
+        uplinkPayload.bytes[i] = data[i];  // data[i] == *(data + i)
+    }
 
-        _uplink_payload.bytes[0] = hum >> 8;
-        _uplink_payload.bytes[1] = hum & 0xFF;
-        _uplink_payload.bytes[2] = temp >> 8;
-        _uplink_payload.bytes[3] = temp & 0xFF;
-        _uplink_payload.bytes[4] = co2_ppm >> 8;
-        _uplink_payload.bytes[5] = co2_ppm & 0xFF;
+    lora_driver_returnCode_t rc;
 
-        status_leds_shortPuls(led_ST4);  // OPTIONAL
-        printf(
-            "Upload Message >%s<\n",
-            lora_driver_mapReturnCodeToText(lora_driver_sendUploadMessage(false, &_uplink_payload)));
+    if ((rc = lora_driver_sendUploadMessage(false, &uplinkPayload)) == LORA_MAC_TX_OK)
+    {
+        // The uplink message is sent and there is no downlink message received
+        puts("successful sent !!");
+    }
+    else if (rc == LORA_MAC_RX)
+    {
+        // The uplink message is sent and a downlink message is received
+        puts("successful sent with downlink message  !!");
+    }
+    else
+    {
+        puts("failed to send");
     }
 }

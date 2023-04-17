@@ -10,12 +10,19 @@
 #include <avr/io.h>
 #include <semphr.h>
 #include <serial.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdio_driver.h>
 #include <task.h>
 
+#include <ATMEGA_FreeRTOS.h>
+
+#include <lora_driver.h>
+#include <status_leds.h>
 #include "co2.h"
 #include "humidity_temperature.h"
+#include "lorawan.h"
+#include "payload.h"
 
 // Needed for LoRaWAN
 #include <lora_driver.h>
@@ -27,7 +34,7 @@ void task2(void *pvParameters);
 
 // define semaphore handle
 SemaphoreHandle_t xTestSemaphore;
-
+// static lora_driver_payload_t _uplink_payload;
 // Prototype for LoRaWAN handler
 void lora_handler_initialise(UBaseType_t lora_handler_task_priority);
 
@@ -69,7 +76,7 @@ void create_tasks_and_semaphores(void)
 void task1(void *pvParameters)
 {
     TickType_t       xLastWakeTime;
-    const TickType_t xFrequency = 500 / portTICK_PERIOD_MS;  // 500 ms
+    const TickType_t xFrequency = 5000 / portTICK_PERIOD_MS;  // 500 ms
 
     // Initialise the xLastWakeTime variable with the current time.
     xLastWakeTime = xTaskGetTickCount();
@@ -79,29 +86,12 @@ void task1(void *pvParameters)
         if (hum_temp_measure())
         {
             puts("measure is successfully read");
-            printf("hum: %u , temp: %u \n", get_last_humidity_measurement(), get_last_temperature_measurement());
+            printf("hum: %u , temp: %u \n", humidity_get_last_measurement(), temperature_get_last_measurement());
         }
         else
         {
             puts("Can't read humidity and temperature measurements");
         }
-        xTaskDelayUntil(&xLastWakeTime, xFrequency);
-        PORTA ^= _BV(PA0);
-    }
-}
-
-/*-----------------------------------------------------------*/
-void task2(void *pvParameters)
-{
-    TickType_t       xLastWakeTime;
-    const TickType_t xFrequency = 1000 / portTICK_PERIOD_MS;  // 1000 ms
-
-    // Initialise the xLastWakeTime variable with the current time.
-    xLastWakeTime = xTaskGetTickCount();
-
-    for (;;)
-    {
-        xTaskDelayUntil(&xLastWakeTime, xFrequency);
         if (co2_measure())
         {
             printf("Co2 read = %u\n", co2_get_latest_measurement());
@@ -111,6 +101,34 @@ void task2(void *pvParameters)
             printf("Error reading co2\n");
         }
 
+        xTaskDelayUntil(&xLastWakeTime, xFrequency);
+        PORTA ^= _BV(PA0);
+    }
+}
+
+/*-----------------------------------------------------------*/
+void task2(void *pvParameters)
+{
+    loran_prepare_LoRaWan_module();
+    loran_setup_OTAA();
+    puts("Join OTAA successfully !!");
+
+    TickType_t       xLastWakeTime;
+    const TickType_t xFrequency = 10000 / portTICK_PERIOD_MS;  // 1000 ms
+                                                               // loran_setup_OTAA();
+    // Initialise the xLastWakeTime variable with the current time.
+    xLastWakeTime = xTaskGetTickCount();
+
+    for (;;)
+    {
+        xTaskDelayUntil(&xLastWakeTime, xFrequency);
+        uint16_t         hum     = humidity_get_last_measurement();
+        int16_t          temp    = temperature_get_last_measurement();
+        uint16_t         co2_ppm = co2_get_latest_measurement();
+        uint8_t          flags   = 0xE0;
+        payload_uplink_t p       = payload_pack_thc(flags, temp, hum, co2_ppm);
+        loran_send_uplink(p.data, p.length, 6);
+        puts("Task2 done.");
         PORTA ^= _BV(PA7);
     }
 }
@@ -129,16 +147,15 @@ void initialiseSystem()
     // vvvvvvvvvvvvvvvvv BELOW IS LoRaWAN initialisation vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     // Status Leds driver
     status_leds_initialise(5);  // Priority 5 for internal task
-    // Initialise the LoRaWAN driver without down-link buffer
-    lora_driver_initialise(1, NULL);
-    // Create LoRaWAN task and start it up with priority 3
-    lora_handler_initialise(3);
+
+    lorawan_init(ser_USART1, NULL);
 }
 
 /*-----------------------------------------------------------*/
 int main(void)
 {
     initialiseSystem();  // Must be done as the very first thing!!
+
     printf("Program Started!!\n");
     if (hum_temp_init())
     {

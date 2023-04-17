@@ -1,8 +1,7 @@
-#include "humidity_temperature.h"
-
 #include <hih8120.h>
 #include <stdint.h>
 #include <util/delay.h>
+#include "humidity_temperature.h"
 
 uint16_t hum_last_measurement, temp_last_measurement;
 
@@ -50,11 +49,11 @@ void hum_temp_destroy()
 {
     hih8120_destroy();
 }
-uint16_t get_last_humidity_measurement()
+uint16_t humidity_get_last_measurement()
 {
     return hum_last_measurement;
 }
-uint16_t get_last_temperature_measurement()
+uint16_t temperature_get_last_measurement()
 {
     return temp_last_measurement;
 }
