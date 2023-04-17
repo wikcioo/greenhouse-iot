@@ -4,7 +4,27 @@ extern "C" {
 	#include "payload.h"
 }
 
-TEST(payload, Packing) {
+TEST(payload, PackingLowerBounds)
+{
+    // Id THC_READINGS -> 000001
+
+    uint8_t  flags       = 224;     // 1110 0000
+    int16_t  temperature = 0;       // -50 C -> 000 0000 0000
+    uint8_t  humidity    = 0;       // 000 0000
+    uint16_t co2         = 0;       // 0000 0000 0000
+
+    payload_uplink_t payload_packed = payload_pack_thc(flags, temperature, humidity, co2);
+    // Packed payload 00000111 10000000 00000000 00000000 00000000 00000000
+    EXPECT_EQ(payload_packed.length, 6);
+    EXPECT_EQ(payload_packed.data[0], 7);
+    EXPECT_EQ(payload_packed.data[1], 128);
+    EXPECT_EQ(payload_packed.data[2], 0);
+    EXPECT_EQ(payload_packed.data[3], 0);
+    EXPECT_EQ(payload_packed.data[4], 0);
+    EXPECT_EQ(payload_packed.data[5], 0);
+}
+
+TEST(payload, PackingNormalValues) {
 	//Id THC_READINGS -> 000001
 
 	uint8_t  flags = 224;     // 1110 0000
@@ -13,7 +33,7 @@ TEST(payload, Packing) {
 	uint16_t co2 = 1900;		// 0111 0110 1100
 
 	payload_uplink_t payload_packed = payload_pack_thc(flags, temperature, humidity, co2);
-	// Packed payload 00000111 10000001 10101011 10101101 01110110 1100
+	// Packed payload 00000111 10000001 10101011 10101101 01110110 11000000
     EXPECT_EQ(payload_packed.length, 6);
     EXPECT_EQ(payload_packed.data[0], 7);
     EXPECT_EQ(payload_packed.data[1], 129);
@@ -21,6 +41,26 @@ TEST(payload, Packing) {
     EXPECT_EQ(payload_packed.data[3], 173);
     EXPECT_EQ(payload_packed.data[4], 118);
     EXPECT_EQ(payload_packed.data[5], 192);
+}
+
+TEST(payload, PackingUpperBounds)
+{
+    // Id THC_READINGS -> 000001
+
+    uint8_t  flags       = 224;   // 1110 0000
+    int16_t  temperature = 1100;   // 60 C -> 100 0100 1100
+    uint8_t  humidity    = 100;    // 110 0100
+    uint16_t co2         = 4095;  // 1111 1111 1111
+
+    payload_uplink_t payload_packed = payload_pack_thc(flags, temperature, humidity, co2);
+    // Packed payload 00000111 10000010 00100110 01100100 11111111 11110000
+    EXPECT_EQ(payload_packed.length, 6);
+    EXPECT_EQ(payload_packed.data[0], 7);
+    EXPECT_EQ(payload_packed.data[1], 130);
+    EXPECT_EQ(payload_packed.data[2], 38);
+    EXPECT_EQ(payload_packed.data[3], 100);
+    EXPECT_EQ(payload_packed.data[4], 255);
+    EXPECT_EQ(payload_packed.data[5], 240);
 }
 
 TEST(payload, Unpacking) {
