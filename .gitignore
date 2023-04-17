@@ -4,3 +4,4 @@ compile_commands.json
 Debug/
 *.xml
 .vs/
+out/
