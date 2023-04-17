@@ -63,22 +63,60 @@ TEST(payload, PackingUpperBounds)
     EXPECT_EQ(payload_packed.data[5], 240);
 }
 
-TEST(payload, Unpacking) {
+TEST(payload, UnpackingLowerBounds)
+{
     // Packed payload in binary v
     // Id THC_PRESETS  000 011 -> 6 bits
-    // Temp ranges 
-        // low = 15.5 -> 155 -> 655 -> 01 010 001 111 -> 11 bits
-        // high = 45 -> 450 -> 950 ->  01 110 110 110 -> 11 bits
+    // Temp ranges
+    // low = -50 -> -500 -> 0 -> 00 000 000 000 -> 11 bits
+    // high = -50 -> -500 -> 0 ->  00 000 000 000 -> 11 bits
     // Hum ranges
-        // low = 20 -> 0 010 100 -> 7 bits
-        // high = 80 -> 1 010 000 -> 7 bits
+    // low = 0 -> 0 000 000 -> 7 bits
+    // high = 0 -> 0 000 000 -> 7 bits
     // Co2 ranges
-        // low = 500 ->  000 111 110 100 -> 12 bits
-        // high = 2000 -> 011 111 010 000 -> 12 bits
+    // low = 0 ->  000 000 000 000 -> 12 bits
+    // high = 0 -> 000 000 000 000 -> 12 bits
 
-    // Concatenated 000 011 01 010 001 111 01 110 110 110 0 010 100 1 010 000 000 111 110 100 011 111 010 000 + 000 000 -> 72 bits -> 0D47BB629407D1F400
+    // Concatenated 000 011 00 000 000 000 00 000 000 000 0 000 000 0 000 000 000 000 000 000 000 000 000 000 000000
+    // -> 72 bits -> 0C0000000000000000
 
-    char *hex_str = "0D47BB629407D1F400";
+    char   *hex_str = "0C0000000000000000";
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
+
+    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+
+    EXPECT_EQ(payload_get_id(hex_str), 3);
+
+    EXPECT_EQ(temp_range.low, 0);
+    EXPECT_EQ(temp_range.high, 0);
+
+    EXPECT_EQ(hum_range.low, 0);
+    EXPECT_EQ(hum_range.high, 0);
+
+    EXPECT_EQ(co2_range.low, 0);
+    EXPECT_EQ(co2_range.high, 0);
+}
+
+TEST(payload, UnpackingNormalValues)
+{
+    // Packed payload in binary v
+    // Id THC_PRESETS  000 011 -> 6 bits
+    // Temp ranges
+    // low = 15.5 -> 155 -> 655 -> 01 010 001 111 -> 11 bits
+    // high = 45 -> 450 -> 950 ->  01 110 110 110 -> 11 bits
+    // Hum ranges
+    // low = 20 -> 0 010 100 -> 7 bits
+    // high = 80 -> 1 010 000 -> 7 bits
+    // Co2 ranges
+    // low = 500 ->  000 111 110 100 -> 12 bits
+    // high = 2000 -> 011 111 010 000 -> 12 bits
+
+    // Concatenated 000 011 01 010 001 111 01 110 110 110 0 010 100 1 010 000 000 111 110 100 011 111 010 000 + 000 000
+    // -> 72 bits -> 0D47BB629407D1F400
+
+    char   *hex_str = "0D47BB629407D1F400";
     range_t temp_range;
     range_t hum_range;
     range_t co2_range;
@@ -95,4 +133,40 @@ TEST(payload, Unpacking) {
 
     EXPECT_EQ(co2_range.low, 500);
     EXPECT_EQ(co2_range.high, 2000);
+}
+
+TEST(payload, UnpackingUpperBounds)
+{
+    // Packed payload in binary v
+    // Id THC_PRESETS  000 011 -> 6 bits
+    // Temp ranges
+    // low = 60 -> 600 -> 1100 -> 10 001 001 100 -> 11 bits
+    // high = 60 -> 600 -> 1100 ->  10 001 001 100 -> 11 bits
+    // Hum ranges
+    // low = 100 -> 1 100 100 -> 7 bits
+    // high = 100 -> 1 100 100 -> 7 bits
+    // Co2 ranges
+    // low = 4095 ->  111 111 111 111 -> 12 bits
+    // high = 4095 -> 111 111 111 111 -> 12 bits
+
+    // Concatenated 000 011 10 001 001 100 10 001 001 100 1 100 100 1 100 100 111 111 111 111 111 111 111 111 000000
+    // -> 72 bits -> 0E2644CC993FFFFFC0
+
+    char   *hex_str = "0E2644CC993FFFFFC0";
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
+
+    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+
+    EXPECT_EQ(payload_get_id(hex_str), 3);
+
+    EXPECT_EQ(temp_range.low, 1100);
+    EXPECT_EQ(temp_range.high, 1100);
+
+    EXPECT_EQ(hum_range.low, 100);
+    EXPECT_EQ(hum_range.high, 100);
+
+    EXPECT_EQ(co2_range.low, 4095);
+    EXPECT_EQ(co2_range.high, 4095);
 }
