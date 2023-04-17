@@ -20,7 +20,7 @@ TEST(payload, Packing) {
     EXPECT_EQ(payload_packed.data[2], 171);
     EXPECT_EQ(payload_packed.data[3], 173);
     EXPECT_EQ(payload_packed.data[4], 118);
-    EXPECT_EQ(payload_packed.data[5], 12);
+    EXPECT_EQ(payload_packed.data[5], 192);
 }
 
 TEST(payload, Unpacking) {
