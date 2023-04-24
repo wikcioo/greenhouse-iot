@@ -14,6 +14,9 @@
 #include <stdio_driver.h>
 #include <task.h>
 
+#include "co2.h"
+#include "humidity_temperature.h"
+
 // Needed for LoRaWAN
 #include <lora_driver.h>
 #include <status_leds.h>
@@ -73,8 +76,16 @@ void task1(void *pvParameters)
 
     for (;;)
     {
+        if (hum_temp_measure())
+        {
+            puts("measure is successfully read");
+            printf("hum: %u , temp: %u \n", get_last_humidity_measurement(), get_last_temperature_measurement());
+        }
+        else
+        {
+            puts("Can't read humidity and temperature measurements");
+        }
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
-        puts("Task69420");  // stdio functions are not reentrant - Should normally be protected by MUTEX
         PORTA ^= _BV(PA0);
     }
 }
@@ -91,7 +102,15 @@ void task2(void *pvParameters)
     for (;;)
     {
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
-        puts("Task2");  // stdio functions are not reentrant - Should normally be protected by MUTEX
+        if (co2_measure())
+        {
+            printf("Co2 read = %u\n", co2_get_latest_measurement());
+        }
+        else
+        {
+            printf("Error reading co2\n");
+        }
+
         PORTA ^= _BV(PA7);
     }
 }
@@ -121,6 +140,17 @@ int main(void)
 {
     initialiseSystem();  // Must be done as the very first thing!!
     printf("Program Started!!\n");
+    if (hum_temp_init())
+    {
+        puts("HIH8120 driver initialized successfully");
+    }
+    else
+    {
+        puts("HIH8120 driver failed");
+    }
+
+    co2_init();
+
     vTaskStartScheduler();  // Initialise and run the freeRTOS scheduler. Execution should never return from here.
 
     /* Replace with your application code */
