@@ -1,4 +1,30 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "payload.h"
+
+static uint8_t *hex_str_to_u8_ptr(const char *hex_str)
+{
+    size_t   length = strlen(hex_str);
+    uint8_t *data   = (uint8_t *) calloc(length / 2, sizeof(uint8_t));
+
+    for (size_t i = 0; i < length; i += 2)
+    {
+        char    hex_byte[3] = {hex_str[i], hex_str[i + 1], '\0'};
+        uint8_t hex_value;
+        sscanf(hex_byte, "%hhx", &hex_value);
+        data[i / 2] = hex_value;
+    }
+
+    return data;
+}
+
+payload_id_t payload_get_id(const char *hex_str)
+{
+    uint8_t *data = hex_str_to_u8_ptr(hex_str);
+    return (payload_id_t) ((data[0] >> 2) & 0x3F);
+}
 
 payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint8_t humidity, uint16_t co2)
 {
