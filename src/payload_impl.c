@@ -48,3 +48,34 @@ payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint8_t hu
 
     return (payload_uplink_t){payload, 6};
 }
+
+void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_t *hum_range, range_t *co2_range)
+{
+    uint8_t *data = hex_str_to_u8_ptr(hex_str);
+
+    temp_range->low = 0;
+    temp_range->low |= ((data[0] & 0x3) << 9);
+    temp_range->low |= ((data[1] & 0xFF) << 1);
+    temp_range->low |= ((data[2] >> 7) & 0x1);
+
+    temp_range->high = 0;
+    temp_range->high |= ((data[2] & 0x7F) << 4);
+    temp_range->high |= ((data[3] >> 4) & 0xF);
+
+    hum_range->low = 0;
+    hum_range->low |= ((data[3] & 0xF) << 3);
+    hum_range->low |= ((data[4] >> 5) & 0x7);
+
+    hum_range->high = 0;
+    hum_range->high |= (data[4] & 0x1F) << 2;
+    hum_range->high |= ((data[5] >> 6) & 0x3);
+
+    co2_range->low = 0;
+    co2_range->low |= (data[5] & 0x3F) << 6;
+    co2_range->low |= ((data[6] >> 2) & 0x3F);
+
+    co2_range->high = 0;
+    co2_range->high |= (data[6] & 0x3) << 10;
+    co2_range->high |= (data[7] & 0xFF) << 2;
+    co2_range->high |= ((data[8] >> 6) & 0x3);
+}
