@@ -1,5 +1,5 @@
 FIRMWARE_NAME := iot_firmware
-FIRMWARE      := $(FIRMWARE_NAME)
+FIRMWARE      := $(FIRMWARE_NAME).elf
 FIRMWARE_HEX  := $(FIRMWARE_NAME).hex
 
 TOOLCHAIN := avr-
@@ -7,17 +7,18 @@ CC        := $(TOOLCHAIN)gcc
 MCU       := atmega2560
 
 FREE_RTOS_SRC_DIR := submodules/freeRTOS/src
-DRIVERS_DIR       := submodules/drivers
-USER_CODE_INC_DIR := inc
+DRIVERS_LIB_DIR   := drivers/lib
+DRIVERS_INC_DIR   := drivers/include
+USER_CODE_INC_DIR := include
 USER_CODE_SRC_DIR := src
 BUILD_DIR         := build
 TESTS_DIR         := tests
 
-IOT_LIB   := IotLibrary
-CPU_SPEED := 16000000L
+DRIVERS_LIB_NAME := drivers_debug
+CPU_SPEED        := 16000000L
 
-CFLAGS  := -c -mmcu=$(MCU) -std=gnu11 -O2 -DF_CPU=$(CPU_SPEED) -I$(FREE_RTOS_SRC_DIR) -I$(DRIVERS_DIR) -I$(USER_CODE_INC_DIR)
-LDFLAGS := -mmcu=$(MCU) -L$(DRIVERS_DIR) -lm -l$(IOT_LIB)
+CFLAGS  := -c -mmcu=$(MCU) -std=gnu11 -Og -ggdb -DF_CPU=$(CPU_SPEED) -I$(FREE_RTOS_SRC_DIR) -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR)
+LDFLAGS := -mmcu=$(MCU) -L$(DRIVERS_LIB_DIR) -lm -l$(DRIVERS_LIB_NAME)
 
 SOURCES := $(wildcard $(FREE_RTOS_SRC_DIR)/*.c)
 SOURCES += $(wildcard $(USER_CODE_SRC_DIR)/*.c)
@@ -44,7 +45,7 @@ $(BUILD_DIR)/%.c.o: $(USER_CODE_SRC_DIR)/%.c
 	$(CC) $^ $(CFLAGS) -o $@
 
 flash: $(BUILD_DIR)/$(FIRMWARE_HEX)
-	avrdude -C /etc/avrdude.conf -v -p m2560 -c atmelice_isp -P usb -U flash:w:$^:i
+	avrdude -C /etc/avrdude.conf -v -p m2560 -c atmelice -P usb -U flash:w:$^:i
 
 test:
 	@$(MAKE) -C $(TESTS_DIR) --no-print-directory
