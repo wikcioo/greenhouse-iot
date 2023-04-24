@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode-remote.remote-ssh",
+        "webfreak.debug",
+        "xaver.clang-format"
+    ]
+}
