@@ -30,6 +30,7 @@ Here you you will find the functions you will need to work with the driver.
 #ifndef HIH8120_H_
 #define HIH8120_H_
 #include <stdbool.h>
+#include <stdint.h>
 
 /**
 \ingroup hih8120_driver_return_codes
