@@ -1,0 +1,22 @@
+name: Google Test with Makefile
+
+on:
+  push:
+    branches: [ "master", "dev" ]
+  pull_request:
+    branches: [ "master", "dev" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Make configure.sh executable
+        run: chmod +x configure.sh
+      - name: Configure
+        run: ./configure.sh -c
+      - name: Build tests
+        run: make test
+      - name: Run tests
+        run: ./tests/build/gtest_tests
+
