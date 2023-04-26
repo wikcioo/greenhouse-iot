@@ -56,11 +56,11 @@ if [[ "$cli_mode" = false ]]; then
 fi
 
 # List of base packages to check for
-packages=("gcc-avr" "avr-libc" "make" "libgtest-dev" "bear")
+packages=("gcc-avr" "avr-libc" "make" "libgtest-dev")
 
 if [ "$cli_mode" = false ]; then
     # Add more packages in user mode
-    packages+=("gdb-avr" "avrdude" "avarice")
+    packages+=("gdb-avr" "avrdude" "avarice" "bear" "minicom")
 fi
 
 missing=()
