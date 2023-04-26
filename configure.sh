@@ -60,7 +60,7 @@ packages=("gcc-avr" "avr-libc" "make" "libgtest-dev")
 
 if [ "$cli_mode" = false ]; then
     # Add more packages in user mode
-    packages+=("gdb-avr" "avrdude" "avarice" "bear" "minicom")
+    packages+=("gdb-avr" "avrdude" "avarice" "bear" "minicom" "clang-format")
 fi
 
 missing=()
