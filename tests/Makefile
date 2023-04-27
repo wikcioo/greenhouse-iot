@@ -3,8 +3,8 @@ OUTPUT_FILENAME := gtest_tests
 CC  := gcc
 CXX := g++
 
-DRIVERS_DIR       := ../submodules/drivers
-USER_CODE_INC_DIR := ../inc
+DRIVERS_DIR       := ../drivers
+USER_CODE_INC_DIR := ../include
 USER_CODE_SRC_DIR := ../src
 MOCKS_DIR         := mocks
 TEST_SRC_DIR      := src
@@ -12,7 +12,7 @@ FFF_DIR           := vendor
 BUILD_DIR         := build
 
 CFLAGS   := -c -I$(DRIVERS_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR)
-CXXFLAGS := -c -I$(DRIVERS_DIR) -I$(MOCKS_DIR) -I$(FFF_DIR)
+CXXFLAGS := -c -I$(DRIVERS_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR) -I$(FFF_DIR)
 LDFLAGS  := -lgtest -lpthread
 
 # Add user source files you want to test to C_FILES variable
