@@ -54,28 +54,39 @@ void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_
     uint8_t *data = hex_str_to_u8_ptr(hex_str);
 
     temp_range->low = 0;
-    temp_range->low |= ((data[0] & 0x3) << 9);
-    temp_range->low |= ((data[1] & 0xFF) << 1);
-    temp_range->low |= ((data[2] >> 7) & 0x1);
+    temp_range->low |= (data[0] & 0x3) << 9;
+    temp_range->low |= (data[1] & 0xFF) << 1;
+    temp_range->low |= (data[2] >> 7) & 0x1;
 
     temp_range->high = 0;
-    temp_range->high |= ((data[2] & 0x7F) << 4);
-    temp_range->high |= ((data[3] >> 4) & 0xF);
+    temp_range->high |= (data[2] & 0x7F) << 4;
+    temp_range->high |= (data[3] >> 4) & 0xF;
 
     hum_range->low = 0;
-    hum_range->low |= ((data[3] & 0xF) << 3);
-    hum_range->low |= ((data[4] >> 5) & 0x7);
+    hum_range->low |= (data[3] & 0xF) << 3;
+    hum_range->low |= (data[4] >> 5) & 0x7;
 
     hum_range->high = 0;
     hum_range->high |= (data[4] & 0x1F) << 2;
-    hum_range->high |= ((data[5] >> 6) & 0x3);
+    hum_range->high |= (data[5] >> 6) & 0x3;
 
     co2_range->low = 0;
     co2_range->low |= (data[5] & 0x3F) << 6;
-    co2_range->low |= ((data[6] >> 2) & 0x3F);
+    co2_range->low |= (data[6] >> 2) & 0x3F;
 
     co2_range->high = 0;
     co2_range->high |= (data[6] & 0x3) << 10;
     co2_range->high |= (data[7] & 0xFF) << 2;
-    co2_range->high |= ((data[8] >> 6) & 0x3);
+    co2_range->high |= (data[8] >> 6) & 0x3;
+}
+
+void payload_unpack_actions(const char *hex_str, action_t *actions)
+{
+    uint8_t *data = hex_str_to_u8_ptr(hex_str);
+
+    actions->water_on = (data[0] >> 1) & 1;
+
+    actions->interval = 0;
+    actions->interval |= (data[1] & 0x3) << 8;
+    actions->interval |= data[2] & 0xFF;
 }
