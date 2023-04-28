@@ -40,11 +40,12 @@ payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint8_t hu
     payload[2] |= ((temperature >> 1) & 0xFF);  // 3rd byte += 8bits of temperature
 
     payload[3] |= ((temperature & 0x1) << 7);  // 4th byte += 1bit of temperature
-    payload[3] |= (humidity & 0x7F);           // 4th byte += 7bits of humidity
+    payload[3] |= ((humidity >> 3) & 0x7F);    // 4th byte += 7bits of humidity
 
-    payload[4] |= ((co2 >> 4) & 0xFF);  // 5th byte += 8bits of co2
-
-    payload[5] |= (co2 & 0xF) << 4;  // 6th byte += 4bits of co2
+    payload[4] |= ((humidity & 0x7) << 5);   // 5th byte += 3bits of humidity
+    payload[4] |= ((co2 >> 8) & 0x1F);       // 5th byte += 5bits of co2
+    
+    payload[5] |= ((co2) & 0xFF);  // 6th byte += 8bits of co2
 
     return (payload_uplink_t){payload, 6};
 }
