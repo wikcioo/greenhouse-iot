@@ -26,7 +26,7 @@ payload_id_t payload_get_id(const char *hex_str)
     return (payload_id_t) ((data[0] >> 2) & 0x3F);
 }
 
-payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint8_t humidity, uint16_t co2)
+payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint16_t humidity, uint16_t co2)
 {
     static uint8_t payload[6];
 
