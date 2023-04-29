@@ -42,10 +42,10 @@ payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint16_t h
     payload[3] |= ((temperature & 0x1) << 7);  // 4th byte += 1bit of temperature
     payload[3] |= ((humidity >> 3) & 0x7F);    // 4th byte += 7bits of humidity
 
-    payload[4] |= ((humidity & 0x7) << 5);   // 5th byte += 3bits of humidity
-    payload[4] |= ((co2 >> 8) & 0x1F);       // 5th byte += 5bits of co2
-    
-    payload[5] |= ((co2) & 0xFF);  // 6th byte += 8bits of co2
+    payload[4] |= ((humidity & 0x7) << 5);  // 5th byte += 3bits of humidity
+    payload[4] |= ((co2 >> 8) & 0x1F);      // 5th byte += 5bits of co2
+
+    payload[5] |= ((co2) &0xFF);  // 6th byte += 8bits of co2
 
     return (payload_uplink_t){payload, 6};
 }
@@ -72,13 +72,13 @@ void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_
     hum_range->high |= (data[5] >> 6) & 0x3;
 
     co2_range->low = 0;
-    co2_range->low |= (data[5] & 0x3F) << 6;
-    co2_range->low |= (data[6] >> 2) & 0x3F;
+    co2_range->low |= (data[5] & 0x3F) << 7;
+    co2_range->low |= (data[6] >> 1) & 0x7F;
 
     co2_range->high = 0;
-    co2_range->high |= (data[6] & 0x3) << 10;
-    co2_range->high |= (data[7] & 0xFF) << 2;
-    co2_range->high |= (data[8] >> 6) & 0x3;
+    co2_range->high |= (data[6] & 0x1) << 12;
+    co2_range->high |= (data[7] & 0xFF) << 4;
+    co2_range->high |= (data[8] >> 4) & 0xF;
 }
 
 void payload_unpack_actions(const char *hex_str, action_t *actions)
