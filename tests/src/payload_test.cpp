@@ -23,3 +23,228 @@ TEST(payload, UnpackingActions)
     EXPECT_EQ(actions.water_on, true);
     EXPECT_EQ(actions.interval, 15);
 }
+
+TEST(payload, PackingLowerBounds)
+{
+    // Id THC_READINGS -> 000001
+
+    uint8_t  flags       = 224;  // 1110 0000
+    int16_t  temperature = 0;    // -50 C -> 000 0000 0000
+    uint16_t humidity    = 0;    // 00 0000 0000
+    uint16_t co2         = 0;    // 0 0000 0000 0000
+
+    payload_uplink_t payload_packed = payload_pack_thc(flags, temperature, humidity, co2);
+    // Packed payload 00000111 10000000 00000000 00000000 00000000 00000000
+    EXPECT_EQ(payload_packed.length, 6);
+    EXPECT_EQ(payload_packed.data[0], 7);
+    EXPECT_EQ(payload_packed.data[1], 128);
+    EXPECT_EQ(payload_packed.data[2], 0);
+    EXPECT_EQ(payload_packed.data[3], 0);
+    EXPECT_EQ(payload_packed.data[4], 0);
+    EXPECT_EQ(payload_packed.data[5], 0);
+}
+
+TEST(payload, PackingNormalValues1)
+{
+    // Id THC_READINGS -> 000001
+
+    uint8_t  flags       = 224;   // 1110 0000
+    int16_t  temperature = 855;   // 35.5 C -> 011 0101 0111
+    uint16_t humidity    = 450;   // 01 1100 0010
+    uint16_t co2         = 1900;  // 0 0111 0110 1100
+
+    payload_uplink_t payload_packed = payload_pack_thc(flags, temperature, humidity, co2);
+    // Packed payload 00000111 10000001 10101011 10111000 01000111 01101100
+    EXPECT_EQ(payload_packed.length, 6);
+    EXPECT_EQ(payload_packed.data[0], 7);
+    EXPECT_EQ(payload_packed.data[1], 129);
+    EXPECT_EQ(payload_packed.data[2], 171);
+    EXPECT_EQ(payload_packed.data[3], 184);
+    EXPECT_EQ(payload_packed.data[4], 71);
+    EXPECT_EQ(payload_packed.data[5], 108);
+}
+
+TEST(payload, PackingNormalValues2)
+{
+    // Id THC_READINGS -> 000001
+
+    uint8_t  flags       = 224;   // 1110 0000
+    int16_t  temperature = 855;   // 35.5 C -> 011 0101 0111
+    uint16_t humidity    = 455;   // 01 1100 0111
+    uint16_t co2         = 1900;  // 0 0111 0110 1100
+
+    payload_uplink_t payload_packed = payload_pack_thc(flags, temperature, humidity, co2);
+    // Packed payload 00000111 10000001 10101011 10111000 11100111 01101100
+    EXPECT_EQ(payload_packed.length, 6);
+    EXPECT_EQ(payload_packed.data[0], 7);
+    EXPECT_EQ(payload_packed.data[1], 129);
+    EXPECT_EQ(payload_packed.data[2], 171);
+    EXPECT_EQ(payload_packed.data[3], 184);
+    EXPECT_EQ(payload_packed.data[4], 231);
+    EXPECT_EQ(payload_packed.data[5], 108);
+}
+
+TEST(payload, PackingUpperBounds)
+{
+    // Id THC_READINGS -> 000001
+
+    uint8_t  flags       = 224;   // 1110 0000
+    int16_t  temperature = 1100;  // 60 C -> 100 0100 1100
+    uint16_t humidity    = 1000;  // 11 1110 1000
+    uint16_t co2         = 8191;  // 1 1111 1111 1111
+
+    payload_uplink_t payload_packed = payload_pack_thc(flags, temperature, humidity, co2);
+    // Packed payload 00000111 10000010 00100110 01111101 00011111 11111111
+    EXPECT_EQ(payload_packed.length, 6);
+    EXPECT_EQ(payload_packed.data[0], 7);
+    EXPECT_EQ(payload_packed.data[1], 130);
+    EXPECT_EQ(payload_packed.data[2], 38);
+    EXPECT_EQ(payload_packed.data[3], 125);
+    EXPECT_EQ(payload_packed.data[4], 31);
+    EXPECT_EQ(payload_packed.data[5], 255);
+}
+
+TEST(payload, UnpackingLowerBounds)
+{
+    // Packed payload in binary v
+    // Id THC_PRESETS  000 011 -> 6 bits
+    // Temp ranges
+    // low = -50 -> -500 -> 0 -> 00 000 000 000 -> 11 bits
+    // high = -50 -> -500 -> 0 ->  00 000 000 000 -> 11 bits
+    // Hum ranges
+    // low = 0 -> 0 000 000 -> 7 bits
+    // high = 0 -> 0 000 000 -> 7 bits
+    // Co2 ranges
+    // low = 0 -> 0 000 000 000 000 -> 13 bits
+    // high = 0 -> 0 000 000 000 000 -> 13 bits
+
+    // Concatenated 000 011 00 000 000 000 00 000 000 000 0 000 000 0 000 000 000 000 000 000 000 000 000 000 000000
+    // -> 72 bits -> 0C0000000000000000
+
+    char   *hex_str = "0C0000000000000000";
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
+
+    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+
+
+    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+
+    EXPECT_EQ(temp_range.low, 0);
+    EXPECT_EQ(temp_range.high, 0);
+
+    EXPECT_EQ(hum_range.low, 0);
+    EXPECT_EQ(hum_range.high, 0);
+
+    EXPECT_EQ(co2_range.low, 0);
+    EXPECT_EQ(co2_range.high, 0);
+}
+
+TEST(payload, UnpackingNormalValues)
+{
+    // Packed payload in binary v
+    // Id THC_PRESETS  000 011 -> 6 bits
+    // Temp ranges
+    // low = 15.5 -> 155 -> 655 -> 01 010 001 111 -> 11 bits
+    // high = 45 -> 450 -> 950 ->  01 110 110 110 -> 11 bits
+    // Hum ranges
+    // low = 20 -> 0 010 100 -> 7 bits
+    // high = 80 -> 1 010 000 -> 7 bits
+    // Co2 ranges
+    // low = 500 ->  0 000 111 110 100 -> 13 bits
+    // high = 2000 -> 0 011 111 010 000 -> 13 bits
+
+    // Concatenated 000 011 01 010 001 111 01 110 110 110 0 010 100 1 010 000 0 000 111 110 100 0 011 111 010 000 + 0000
+    // -> 72 bits -> 0D47BB629403E87D00
+
+    char   *hex_str = "0D47BB629403E87D00";
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
+
+    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+
+    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+
+    EXPECT_EQ(temp_range.low, 655);
+    EXPECT_EQ(temp_range.high, 950);
+
+    EXPECT_EQ(hum_range.low, 20);
+    EXPECT_EQ(hum_range.high, 80);
+
+    EXPECT_EQ(co2_range.low, 500);
+    EXPECT_EQ(co2_range.high, 2000);
+}
+
+TEST(payload, UnpackingNormalValues2)
+{
+    // Packed payload in binary v
+    // Id THC_PRESETS  000 011 -> 6 bits
+    // Temp ranges
+    // low = 0.5 -> 5 -> 505 -> 00 111 111 001 -> 11 bits
+    // high = 99.5 -> 995 -> 1495 ->  10 111 010 111 -> 11 bits
+    // Hum ranges
+    // low = 5 -> 0 000 101 -> 7 bits
+    // high = 95 -> 1 011 111 -> 7 bits
+    // Co2 ranges
+    // low = 5 ->  0 000 000 000 101 -> 13 bits
+    // high = 8190 -> 1 111 111 111 110 -> 13 bits
+
+    // Concatenated 000 011 00 111 111 001 10 111 010 111 0 000 101 1 011 111 0 000 000 000 101 1 111 111 111 110 + 0000
+    // -> 72 bits -> 0CFCDD70B7C00BFFE0
+
+    char   *hex_str = "0CFCDD70B7C00BFFE0";
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
+
+    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+
+    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+
+    EXPECT_EQ(temp_range.low, 505);
+    EXPECT_EQ(temp_range.high, 1495);
+
+    EXPECT_EQ(hum_range.low, 5);
+    EXPECT_EQ(hum_range.high, 95);
+
+    EXPECT_EQ(co2_range.low, 5);
+    EXPECT_EQ(co2_range.high, 8190);
+}
+
+TEST(payload, UnpackingUpperBounds)
+{
+    // Packed payload in binary v
+    // Id THC_PRESETS  000 011 -> 6 bits
+    // Temp ranges
+    // low = 60 -> 600 -> 1100 -> 10 001 001 100 -> 11 bits
+    // high = 60 -> 600 -> 1100 ->  10 001 001 100 -> 11 bits
+    // Hum ranges
+    // low = 100 -> 1 100 100 -> 7 bits
+    // high = 100 -> 1 100 100 -> 7 bits
+    // Co2 ranges
+    // low = 8191 ->  1 111 111 111 111 -> 13 bits
+    // high = 8191 -> 1 111 111 111 111 -> 13 bits
+
+    // Concatenated 000 011 10 001 001 100 10 001 001 100 1 100 100 1 100 100 1 111 111 111 111 1 111 111 111 111 + 0000
+    // -> 72 bits -> 0E2644CC993FFFFFF0
+
+    char   *hex_str = "0E2644CC993FFFFFF0";
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
+
+    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+
+    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+
+    EXPECT_EQ(temp_range.low, 1100);
+    EXPECT_EQ(temp_range.high, 1100);
+
+    EXPECT_EQ(hum_range.low, 100);
+    EXPECT_EQ(hum_range.high, 100);
+
+    EXPECT_EQ(co2_range.low, 8191);
+    EXPECT_EQ(co2_range.high, 8191);
+}
