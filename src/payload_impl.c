@@ -29,6 +29,7 @@ payload_id_t payload_get_id(const char *hex_str)
 payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint16_t humidity, uint16_t co2)
 {
     static uint8_t payload[6];
+    memset(payload, 0, 6);
 
     payload_id_t id = THC_READINGS;
     payload[0] |= ((uint8_t) id << 2);   // 1st byte += 6bits of ID
@@ -72,13 +73,13 @@ void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_
     hum_range->high |= (data[5] >> 6) & 0x3;
 
     co2_range->low = 0;
-    co2_range->low |= (data[5] & 0x3F) << 6;
-    co2_range->low |= (data[6] >> 2) & 0x3F;
+    co2_range->low |= (data[5] & 0x3F) << 7;
+    co2_range->low |= (data[6] >> 1) & 0x7F;
 
     co2_range->high = 0;
-    co2_range->high |= (data[6] & 0x3) << 10;
-    co2_range->high |= (data[7] & 0xFF) << 2;
-    co2_range->high |= (data[8] >> 6) & 0x3;
+    co2_range->high |= (data[6] & 0x1) << 12;
+    co2_range->high |= (data[7] & 0xFF) << 4;
+    co2_range->high |= (data[8] >> 4) & 0xF;
 }
 
 void payload_unpack_actions(const char *hex_str, action_t *actions)
