@@ -1,0 +1,26 @@
+name: Clang Format Check
+
+on:
+  push:
+    branches: ["master", "dev"]
+  pull_request:
+    branches: ["master", "dev"]
+
+jobs:
+  clang-format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+      - name: Check code formatting
+        run: |
+          if find src/ include/ tests/src/ \
+            -iname *.h -o \
+            -iname *.c -o \
+            -iname *.cpp \
+            | xargs clang-format -style=file -output-replacements-xml \
+            | grep -c "<replacement "; then
+            exit 1
+          fi
