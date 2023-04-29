@@ -72,13 +72,13 @@ void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_
     hum_range->high |= (data[5] >> 6) & 0x3;
 
     co2_range->low = 0;
-    co2_range->low |= (data[5] & 0x3F) << 6;
-    co2_range->low |= (data[6] >> 2) & 0x3F;
+    co2_range->low |= (data[5] & 0x3F) << 7;
+    co2_range->low |= (data[6] >> 1) & 0x7F;
 
     co2_range->high = 0;
-    co2_range->high |= (data[6] & 0x3) << 10;
-    co2_range->high |= (data[7] & 0xFF) << 2;
-    co2_range->high |= (data[8] >> 6) & 0x3;
+    co2_range->high |= (data[6] & 0x1) << 12;
+    co2_range->high |= (data[7] & 0xFF) << 4;
+    co2_range->high |= (data[8] >> 4) & 0xF;
 }
 
 void payload_unpack_actions(const char *hex_str, action_t *actions)
