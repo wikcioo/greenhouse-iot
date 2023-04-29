@@ -1,0 +1,20 @@
+name: Build, Test, and Format Check
+
+on:
+  push:
+    branches: ["master", "dev"]
+  pull_request:
+    branches: ["master", "dev"]
+
+jobs:
+  build-test-and-format-check:
+    name: Build, Test, and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        uses: ./.github/workflows/build.yml
+      - name: Test
+        uses: ./.github/workflows/test.yml
+      - name: Clang Format Check
+        uses: ./.github/workflows/clang-format-check.yml

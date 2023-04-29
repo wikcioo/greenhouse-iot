@@ -1,10 +1,7 @@
 name: Google Test with Makefile
 
 on:
-  push:
-    branches: [ "master", "dev" ]
-  pull_request:
-    branches: [ "master", "dev" ]
+  workflow_call:
 
 jobs:
   test:
@@ -19,4 +16,3 @@ jobs:
         run: make test
       - name: Run tests
         run: ./tests/build/gtest_tests
-
