@@ -1,5 +1,5 @@
 build/
 .cache/
 compile_commands.json
-.env
+include/env.h
 .vscode/settings.json
