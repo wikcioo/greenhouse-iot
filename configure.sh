@@ -35,6 +35,11 @@ if [[ "$cli_mode" = false && ! -f "$env_header_file" ]]; then
     echo -e "#define LORA_appKEY \"${app_key}\"\n#define LORA_appEUI \"${app_eui}\"" >>$env_header_file
 fi
 
+if [[ "$cli_mode" = true ]]; then
+    # Export dummy values to the env_header_file
+    echo -e "#define LORA_appKEY \"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n#define LORA_appEUI \"YYYYYYYYYYYYYYYY\"" >>$env_header_file
+fi
+
 # List of base packages to check for
 packages=("gcc-avr" "avr-libc" "make" "libgtest-dev")
 
