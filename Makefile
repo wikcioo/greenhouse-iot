@@ -17,7 +17,7 @@ TESTS_DIR         := tests
 DRIVERS_LIB_NAME := drivers_debug
 CPU_SPEED        := 16000000L
 
-CFLAGS  := -c -mmcu=$(MCU) -std=gnu11 -Og -ggdb -DF_CPU=$(CPU_SPEED) -I$(FREE_RTOS_SRC_DIR) -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR)
+CFLAGS  := -c -mmcu=$(MCU) -Wall -Wpedantic -Wshadow -std=gnu11 -Og -ggdb -DF_CPU=$(CPU_SPEED) -I$(FREE_RTOS_SRC_DIR) -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR)
 LDFLAGS := -mmcu=$(MCU) -L$(DRIVERS_LIB_DIR) -lm -l$(DRIVERS_LIB_NAME)
 
 SOURCES := $(wildcard $(FREE_RTOS_SRC_DIR)/*.c)
