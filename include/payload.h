@@ -9,6 +9,7 @@ typedef enum
     INTERVALS    = 2,
     THC_PRESETS  = 3,
     ACTIONS      = 4,
+    INVALID      = 5,
 } payload_id_t;
 
 typedef struct
