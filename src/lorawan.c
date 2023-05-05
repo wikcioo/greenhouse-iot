@@ -10,6 +10,7 @@
 
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t downLinkMessageBufferHandle;
+extern EventGroupHandle_t    xCreatedEventGroup;
 
 void uplink_handler_task(void *pvParameters);
 void downlink_handler_task(void *pvParameters);
@@ -64,7 +65,14 @@ void downlink_handler_task(void *pvParameters)
         xMessageBufferReceive(
             downLinkMessageBufferHandle, &downlinkPayload, sizeof(lora_driver_payload_t), portMAX_DELAY);
 
-        printf("DOWN LINK: from port: %d with %d bytes received!", downlinkPayload.portNo, downlinkPayload.len);
+        printf("DOWN LINK: from port: %d with %d bytes received!\n", downlinkPayload.portNo, downlinkPayload.len);
+
+        printf("Payload id = %d\n", payload_get_id_u8_ptr(downlinkPayload.bytes));
+
+        if (payload_get_id_u8_ptr(downlinkPayload.bytes) == ACTIONS)
+        {
+            xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+        }
     }
 }
 

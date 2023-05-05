@@ -12,9 +12,11 @@
 #include "hardware_controller.h"
 #include "humidity_temperature.h"
 #include "lorawan.h"
+#include "water_controller.h"
 
 MessageBufferHandle_t upLinkMessageBufferHandle;
 MessageBufferHandle_t downLinkMessageBufferHandle;
+EventGroupHandle_t    xCreatedEventGroup;
 
 void initialiseManager()
 {
@@ -25,6 +27,7 @@ void initialiseManager()
 
     downLinkMessageBufferHandle = xMessageBufferCreate(sizeof(lora_driver_payload_t) * 2);
     upLinkMessageBufferHandle   = xMessageBufferCreate(20);
+    xCreatedEventGroup          = xEventGroupCreate();
 
     if (hum_temp_init())
     {
@@ -37,7 +40,8 @@ void initialiseManager()
 
     co2_init();
 
-    hc_handler_initialise(4);
+    water_controller_init();
+    hc_handler_initialise(4, 4);
 
     lora_driver_initialise(1, downLinkMessageBufferHandle);
     lora_handler_initialise(3, 3);
