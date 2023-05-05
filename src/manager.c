@@ -12,8 +12,10 @@
 #include "hardware_controller.h"
 #include "humidity_temperature.h"
 #include "lorawan.h"
+#include "payload.h"
 #include "water_controller.h"
 
+MessageBufferHandle_t intervalDataMessageBufferHandle;
 MessageBufferHandle_t upLinkMessageBufferHandle;
 MessageBufferHandle_t downLinkMessageBufferHandle;
 EventGroupHandle_t    xCreatedEventGroup;
@@ -25,9 +27,10 @@ void initialiseManager()
     stdio_initialise(ser_USART0);
     status_leds_initialise(5);
 
-    downLinkMessageBufferHandle = xMessageBufferCreate(sizeof(lora_driver_payload_t) * 2);
-    upLinkMessageBufferHandle   = xMessageBufferCreate(20);
-    xCreatedEventGroup          = xEventGroupCreate();
+    intervalDataMessageBufferHandle = xMessageBufferCreate(sizeof(interval_t));
+    downLinkMessageBufferHandle     = xMessageBufferCreate(sizeof(lora_driver_payload_t) * 2);
+    upLinkMessageBufferHandle       = xMessageBufferCreate(20);
+    xCreatedEventGroup              = xEventGroupCreate();
 
     if (hum_temp_init())
     {
