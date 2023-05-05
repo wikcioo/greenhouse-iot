@@ -20,6 +20,14 @@ static uint8_t *hex_str_to_u8_ptr(const char *hex_str)
     return data;
 }
 
+payload_id_t payload_get_id_u8_ptr(uint8_t *data)
+{
+    uint8_t id = (payload_id_t) ((data[0] >> 2) & 0x3F);
+    if (id > ACTIONS)
+        return INVALID;
+    return id;
+}
+
 payload_id_t payload_get_id(const char *hex_str)
 {
     uint8_t *data = hex_str_to_u8_ptr(hex_str);
@@ -86,6 +94,15 @@ void payload_unpack_actions(const char *hex_str, action_t *actions)
 {
     uint8_t *data = hex_str_to_u8_ptr(hex_str);
 
+    actions->water_on = (data[0] >> 1) & 1;
+
+    actions->interval = 0;
+    actions->interval |= (data[1] & 0x3) << 8;
+    actions->interval |= data[2] & 0xFF;
+}
+
+void payload_unpack_actions_u8_ptr(uint8_t *data, action_t *actions)
+{
     actions->water_on = (data[0] >> 1) & 1;
 
     actions->interval = 0;
