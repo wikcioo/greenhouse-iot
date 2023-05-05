@@ -13,7 +13,8 @@
             ],
             "includePath": [
                 "${workspaceFolder}/submodules/freeRTOS/src",
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/drivers/include",
+                "${workspaceFolder}/include",
                 "/usr/lib/avr/include",
                 "/usr/lib/avr/include/avr",
                 "/usr/include",
