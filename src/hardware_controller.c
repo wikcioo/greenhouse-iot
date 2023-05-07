@@ -23,7 +23,7 @@ void hc_toggle_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        EventBits_t uxBits = xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
+        xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
         puts("Toggling water with event groups\n");
         if (water_controller_get_state())
         {
@@ -39,7 +39,7 @@ void hc_toggle_handler_task(void *pvParameters)
 void hc_handler_task(void *pvParameters)
 {
     TickType_t       xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xFrequency    = pdMS_TO_TICKS(5000UL);
+    const TickType_t xFrequency    = pdMS_TO_TICKS(60000UL);
     uint8_t          counter       = 0;
 
     for (;;)
@@ -53,10 +53,8 @@ void hc_handler_task(void *pvParameters)
         uint16_t hum  = get_last_humidity_measurement();
         uint16_t co2  = co2_get_latest_measurement();
 
-        printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
-
         counter++;
-        printf("Measurement [%d]:\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n", counter, temp, hum, co2);
+        printf("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
 
         if (counter == 5)
         {
