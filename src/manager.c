@@ -13,6 +13,7 @@
 #include "humidity_temperature.h"
 #include "lorawan.h"
 #include "payload.h"
+#include "scheduler.h"
 #include "water_controller.h"
 
 MessageBufferHandle_t intervalDataMessageBufferHandle;
@@ -41,10 +42,18 @@ void initialiseManager()
         puts("HIH8120 driver failed");
     }
 
-    co2_init();
+    if (co2_init())
+    {
+        puts("MH_Z19 driver initialized successfully");
+    }
+    else
+    {
+        puts("MH_Z19 driver failed");
+    }
 
     water_controller_init();
-    hc_handler_initialise(4, 4);
+    hc_handler_initialise(3, 3);
+    scheduler_handler_initialise(4, 4);
 
     lora_driver_initialise(1, downLinkMessageBufferHandle);
     lora_handler_initialise(3, 3);

@@ -121,10 +121,10 @@ TEST(payload, UnpackingLowerBounds)
     // Concatenated 000 011 00 000 000 000 00 000 000 000 0 000 000 0 000 000 000 000 000 000 000 000 000 000 000000
     // -> 72 bits -> 0C0000000000000000
 
-    char   *hex_str = "0C0000000000000000";
-    range_t temp_range;
-    range_t hum_range;
-    range_t co2_range;
+    const char *hex_str = "0C0000000000000000";
+    range_t     temp_range;
+    range_t     hum_range;
+    range_t     co2_range;
 
     payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
 
@@ -158,10 +158,10 @@ TEST(payload, UnpackingNormalValues)
     // Concatenated 000 011 01 010 001 111 01 110 110 110 0 010 100 1 010 000 0 000 111 110 100 0 011 111 010 000 + 0000
     // -> 72 bits -> 0D47BB629403E87D00
 
-    char   *hex_str = "0D47BB629403E87D00";
-    range_t temp_range;
-    range_t hum_range;
-    range_t co2_range;
+    const char *hex_str = "0D47BB629403E87D00";
+    range_t     temp_range;
+    range_t     hum_range;
+    range_t     co2_range;
 
     payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
 
@@ -194,10 +194,10 @@ TEST(payload, UnpackingNormalValues2)
     // Concatenated 000 011 00 111 111 001 10 111 010 111 0 000 101 1 011 111 0 000 000 000 101 1 111 111 111 110 + 0000
     // -> 72 bits -> 0CFCDD70B7C00BFFE0
 
-    char   *hex_str = "0CFCDD70B7C00BFFE0";
-    range_t temp_range;
-    range_t hum_range;
-    range_t co2_range;
+    const char *hex_str = "0CFCDD70B7C00BFFE0";
+    range_t     temp_range;
+    range_t     hum_range;
+    range_t     co2_range;
 
     payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
 
@@ -230,10 +230,10 @@ TEST(payload, UnpackingUpperBounds)
     // Concatenated 000 011 10 001 001 100 10 001 001 100 1 100 100 1 100 100 1 111 111 111 111 1 111 111 111 111 + 0000
     // -> 72 bits -> 0E2644CC993FFFFFF0
 
-    char   *hex_str = "0E2644CC993FFFFFF0";
-    range_t temp_range;
-    range_t hum_range;
-    range_t co2_range;
+    const char *hex_str = "0E2644CC993FFFFFF0";
+    range_t     temp_range;
+    range_t     hum_range;
+    range_t     co2_range;
 
     payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
 
