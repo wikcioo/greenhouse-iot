@@ -16,11 +16,15 @@ jobs:
         run: sudo apt-get install -y clang-format
       - name: Check code formatting
         run: |
-          if find src/ include/ tests/src/ \
-            -iname *.h -o \
-            -iname *.c -o \
-            -iname *.cpp \
-            | xargs clang-format -style=file -output-replacements-xml \
-            | grep -c "<replacement "; then
-            exit 1
-          fi
+          files=$(eval find src/ include/ tests/src/ -iname *.h -o -iname *.c -o -iname *.cpp)
+          check_failed=false
+
+          for line in $files
+          do
+              if clang-format -style=file -output-replacements-xml "$line" | grep -cq "<replacement "; then
+                  check_failed=true
+                  echo "$line has incorrect formatting!"
+              fi
+          done
+
+          [ "$check_failed" = true ] && exit 1 || exit 0
