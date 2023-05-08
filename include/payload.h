@@ -45,3 +45,4 @@ payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint16_t h
 void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_t *hum_range, range_t *co2_range);
 void payload_unpack_actions(const char *hex_str, action_t *actions);
 void payload_unpack_actions_u8_ptr(uint8_t *data, action_t *actions);
+void payload_unpack_intervals(uint8_t *data, uint8_t length, interval_t *intervals);
