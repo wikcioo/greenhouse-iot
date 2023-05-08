@@ -1,0 +1,30 @@
+name: Clang Format Check
+
+on:
+  push:
+    branches: ["master", "dev"]
+  pull_request:
+    branches: ["master", "dev"]
+
+jobs:
+  clang-format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+      - name: Check code formatting
+        run: |
+          files=$(eval find src/ include/ tests/src/ -iname *.h -o -iname *.c -o -iname *.cpp)
+          check_failed=false
+
+          for line in $files
+          do
+              if clang-format -style=file -output-replacements-xml "$line" | grep -cq "<replacement "; then
+                  check_failed=true
+                  echo "$line has incorrect formatting!"
+              fi
+          done
+
+          [ "$check_failed" = true ] && exit 1 || exit 0
