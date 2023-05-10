@@ -19,6 +19,7 @@
 MessageBufferHandle_t intervalDataMessageBufferHandle;
 MessageBufferHandle_t upLinkMessageBufferHandle;
 MessageBufferHandle_t downLinkMessageBufferHandle;
+MessageBufferHandle_t presetDataMessageBufferHandle;
 EventGroupHandle_t    xCreatedEventGroup;
 
 void initialiseManager()
@@ -28,9 +29,10 @@ void initialiseManager()
     stdio_initialise(ser_USART0);
     status_leds_initialise(5);
 
-    intervalDataMessageBufferHandle = xMessageBufferCreate(sizeof(interval_t));
+    intervalDataMessageBufferHandle = xMessageBufferCreate(sizeof(interval_t) * 2);
     downLinkMessageBufferHandle     = xMessageBufferCreate(sizeof(lora_driver_payload_t) * 2);
-    upLinkMessageBufferHandle       = xMessageBufferCreate(20);
+    upLinkMessageBufferHandle       = xMessageBufferCreate(sizeof(sensor_data_t) * 2);
+    presetDataMessageBufferHandle   = xMessageBufferCreate(sizeof(preset_data_t) * 2);
     xCreatedEventGroup              = xEventGroupCreate();
 
     if (hum_temp_init())
@@ -52,7 +54,7 @@ void initialiseManager()
     }
 
     water_controller_init();
-    hc_handler_initialise(3, 3);
+    hc_handler_initialise(3, 3, 3);
     scheduler_handler_initialise(4, 4);
 
     lora_driver_initialise(1, downLinkMessageBufferHandle);
