@@ -84,6 +84,22 @@ void hc_toggle_handler_task(void *pvParameters)
     }
 }
 
+static void _warn_if_measurement_outside_range(const char *name, uint16_t measurement, range_t range)
+{
+    if (measurement < range.low || measurement > range.high)
+    {
+        printf(
+            "[warning]: %s measurement (%u) is outside of range [%u, %u]\n", name, measurement, range.low, range.high);
+    }
+}
+
+static void _handle_measurements_outside_range(uint16_t temp, uint16_t hum, uint16_t co2)
+{
+    _warn_if_measurement_outside_range("temperature", temp, temp_range);
+    _warn_if_measurement_outside_range("humidity", hum, hum_range);
+    _warn_if_measurement_outside_range("co2", co2, co2_range);
+}
+
 void hc_handler_task(void *pvParameters)
 {
     TickType_t       xLastWakeTime = xTaskGetTickCount();
@@ -103,6 +119,8 @@ void hc_handler_task(void *pvParameters)
 
         counter++;
         printf("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
+
+        _handle_measurements_outside_range(temp, hum, co2);
 
         if (counter == 5)
         {
