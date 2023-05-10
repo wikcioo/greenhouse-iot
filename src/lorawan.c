@@ -38,7 +38,13 @@ void uplink_handler_task(void *pvParameters)
         sensor_data_t data;
         xMessageBufferReceive(upLinkMessageBufferHandle, &data, sizeof(sensor_data_t), portMAX_DELAY);
 
-        payload_uplink_t packed_payload = payload_pack_thc(0xE0, data.temp, data.hum, data.co2);
+        // TODO: Unhardcode 0xE0
+        uint8_t flags = 0xE0;
+        if (data.is_water_valve_open)
+        {
+            flags |= 1 << 0;
+        }
+        payload_uplink_t packed_payload = payload_pack_thc(flags, data.temp, data.hum, data.co2);
 
         lora_driver_payload_t _uplink_payload;
         _uplink_payload.len    = packed_payload.length;

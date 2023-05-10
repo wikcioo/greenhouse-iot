@@ -58,7 +58,7 @@ void hc_handler_task(void *pvParameters)
 
         if (counter == 5)
         {
-            sensor_data_t data = {temp, hum, co2};
+            sensor_data_t data = {water_controller_get_state(), temp, hum, co2};
 
             // TODO: Add error handling
             xMessageBufferSend(upLinkMessageBufferHandle, (void *) &data, sizeof(sensor_data_t), portMAX_DELAY);
