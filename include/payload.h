@@ -5,6 +5,14 @@
 
 #include "time_point.h"
 
+#define PAYLOAD_ID_TO_NAME(x)  \
+    (x == 1   ? "THC_READINGS" \
+     : x == 2 ? "INTERVALS"    \
+     : x == 3 ? "THC_PRESETS"  \
+     : x == 4 ? "ACTIONS"      \
+     : x == 5 ? "INVALID"      \
+              : "UNKNOWN")
+
 typedef enum
 {
     THC_READINGS = 1,
