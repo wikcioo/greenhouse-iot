@@ -62,7 +62,11 @@ payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint16_t h
 void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_t *hum_range, range_t *co2_range)
 {
     uint8_t *data = hex_str_to_u8_ptr(hex_str);
+    payload_unpack_thc_presets_u8_ptr(data, temp_range, hum_range, co2_range);
+}
 
+void payload_unpack_thc_presets_u8_ptr(uint8_t *data, range_t *temp_range, range_t *hum_range, range_t *co2_range)
+{
     temp_range->low = 0;
     temp_range->low |= (data[0] & 0x3) << 9;
     temp_range->low |= (data[1] & 0xFF) << 1;
