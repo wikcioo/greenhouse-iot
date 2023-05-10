@@ -5,9 +5,9 @@
 
 #define CO2_RET_CODE_TO_NAME(x) (x == 0 ? "OK" : x == 1 ? "NO MEASUREMENT" : x == 2 ? "NO SERIAL" : "PPM MUST BE > 99")
 
-static uint16_t co2_last_read;
+uint16_t co2_last_read;
 
-static void co2_callback(uint16_t value)
+void co2_callback(uint16_t value)
 {
     co2_last_read = value;
 }
