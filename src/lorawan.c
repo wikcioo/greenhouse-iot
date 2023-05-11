@@ -82,7 +82,7 @@ void downlink_handler_task(void *pvParameters)
         {
             xEventGroupSetBits(xCreatedEventGroup, BIT_0);
         }
-        else if (payload_get_id_u8_ptr(downlinkPayload.bytes) == INTERVALS)
+        else if (payload_id == INTERVALS)
         {
             interval_t intervals[7] = {0};
             payload_unpack_intervals(downlinkPayload.bytes, downlinkPayload.len, intervals);
