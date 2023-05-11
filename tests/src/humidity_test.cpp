@@ -79,3 +79,20 @@ TEST_F(HumidityTest, humidity_measure)
 
     ASSERT_EQ(status, true);
 }
+
+
+TEST_F(HumidityTest, humidity_measure_wakeup_fail)
+{
+    hih8120_wakeup_fake.return_val =  HIH8120_DRIVER_NOT_INITIALISED;
+
+    bool status = hum_temp_measure();
+
+    ASSERT_EQ(hih8120_wakeup_fake.call_count, 1);
+    ASSERT_EQ(hih8120_wakeup_fake.return_val, HIH8120_DRIVER_NOT_INITIALISED);
+
+    ASSERT_EQ(hih8120_measure_fake.call_count, 0);
+
+    ASSERT_EQ(hih8120_getHumidityPercent_x10_fake.call_count, 0);
+
+    ASSERT_EQ(status, false);
+}
