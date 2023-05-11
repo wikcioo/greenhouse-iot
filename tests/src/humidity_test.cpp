@@ -37,3 +37,10 @@ class HumidityTest : public ::testing::Test
 
     void TearDown() override {}
 };
+
+TEST_F(HumidityTest, humidity_init)
+{
+    hum_temp_init();
+
+    ASSERT_EQ(hih8120_initialise_fake.call_count, 1);
+}
