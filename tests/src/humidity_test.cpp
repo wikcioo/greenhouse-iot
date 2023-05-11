@@ -44,3 +44,11 @@ TEST_F(HumidityTest, humidity_init)
 
     ASSERT_EQ(hih8120_initialise_fake.call_count, 1);
 }
+
+TEST_F(HumidityTest, humidity_destroy)
+{
+    hum_temp_destroy();
+
+    ASSERT_EQ(hih8120_destroy_fake.call_count, 1);
+    ASSERT_EQ(hih8120_destroy_fake.return_val, HIH8120_OK);
+}
