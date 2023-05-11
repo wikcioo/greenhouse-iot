@@ -61,3 +61,21 @@ TEST_F(HumidityTest, get_last_humidity_measurement)
 
     ASSERT_EQ(result, 225);
 }
+
+TEST_F(HumidityTest, humidity_measure)
+{
+    hih8120_getHumidityPercent_x10_fake.return_val = 225;
+
+    bool status = hum_temp_measure();
+
+    ASSERT_EQ(hih8120_wakeup_fake.call_count, 1);
+    ASSERT_EQ(hih8120_wakeup_fake.return_val, HIH8120_OK);
+
+    ASSERT_EQ(hih8120_measure_fake.call_count, 1);
+    ASSERT_EQ(hih8120_measure_fake.return_val, HIH8120_OK);
+
+    ASSERT_EQ(hih8120_getHumidityPercent_x10_fake.call_count, 1);
+    ASSERT_EQ(hih8120_getHumidityPercent_x10_fake.return_val, 225);
+
+    ASSERT_EQ(status, true);
+}
