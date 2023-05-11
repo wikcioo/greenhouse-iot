@@ -10,6 +10,7 @@
 
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t downLinkMessageBufferHandle;
+extern MessageBufferHandle_t intervalDataMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
 extern EventGroupHandle_t    xCreatedEventGroup;
 
@@ -80,6 +81,15 @@ void downlink_handler_task(void *pvParameters)
         if (payload_id == ACTIONS)
         {
             xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+        }
+        else if (payload_get_id_u8_ptr(downlinkPayload.bytes) == INTERVALS)
+        {
+            interval_t intervals[7] = {0};
+            payload_unpack_intervals(downlinkPayload.bytes, downlinkPayload.len, intervals);
+            for (uint8_t i = 0; i < (downlinkPayload.len + 1) / 3; i++)
+            {
+                xMessageBufferSend(intervalDataMessageBufferHandle, &(intervals[i]), sizeof(interval_t), portMAX_DELAY);
+            }
         }
         else if (payload_id == THC_PRESETS)
         {
