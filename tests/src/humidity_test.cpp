@@ -52,3 +52,12 @@ TEST_F(HumidityTest, humidity_destroy)
     ASSERT_EQ(hih8120_destroy_fake.call_count, 1);
     ASSERT_EQ(hih8120_destroy_fake.return_val, HIH8120_OK);
 }
+
+TEST_F(HumidityTest, get_last_humidity_measurement)
+{
+    hum_last_measurement = 225;
+
+    uint16_t result = get_last_humidity_measurement();
+
+    ASSERT_EQ(result, 225);
+}
