@@ -63,6 +63,15 @@ TEST_F(HumidityTemperatureTest, get_last_humidity_measurement)
     ASSERT_EQ(result, 225);
 }
 
+TEST_F(HumidityTemperatureTest, get_last_temperature_measurement)
+{
+    temp_last_measurement = 756;
+
+    uint16_t result = get_last_temperature_measurement();
+
+    ASSERT_EQ(result, 756);
+}
+
 TEST_F(HumidityTemperatureTest, humidity_temperature_measure)
 {
     hih8120_getHumidityPercent_x10_fake.return_val = 225;
