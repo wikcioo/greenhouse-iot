@@ -1,7 +1,7 @@
 #include <hih8120.h>
 #include <stdint.h>
 
-#ifdef TEST_ENV
+#ifndef TEST_ENV
 #include <util/delay.h>
 #else
 void _delay_ms(double) {}
