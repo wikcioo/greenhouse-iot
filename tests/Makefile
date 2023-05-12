@@ -11,12 +11,12 @@ TEST_SRC_DIR      := src
 FFF_DIR           := vendor
 BUILD_DIR         := build
 
-CFLAGS   := -c -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR)
+CFLAGS   := -c -DTEST_ENV -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR)
 CXXFLAGS := -c -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR) -I$(FFF_DIR)
 LDFLAGS  := -lgtest -lpthread
 
 # Add user source files you want to test to C_FILES variable
-C_FILES   := payload_impl.c time_point.c co2_impl.c
+C_FILES   := payload_impl.c time_point.c co2_impl.c humidity_temperature_impl.c
 C_SOURCES := $(addprefix $(USER_CODE_SRC_DIR)/, $(C_FILES))
 
 CPP_SOURCES += $(wildcard $(MOCKS_DIR)/*.cpp)
