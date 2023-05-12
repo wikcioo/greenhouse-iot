@@ -36,8 +36,13 @@ if [[ "$cli_mode" = false && ! -f "$env_header_file" ]]; then
 fi
 
 if [[ "$cli_mode" = true ]]; then
-    # Export dummy values to the env_header_file
-    echo -e "#define LORA_appKEY \"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n#define LORA_appEUI \"YYYYYYYYYYYYYYYY\"" >>$env_header_file
+    if [[ $# -eq 3 ]]; then
+        # Export values passed as command line arguments
+        echo -e "#define LORA_appKEY \"$2\"\n#define LORA_appEUI \"$3\"" >>$env_header_file
+    else
+        # Export dummy values to the env_header_file
+        echo -e "#define LORA_appKEY \"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n#define LORA_appEUI \"YYYYYYYYYYYYYYYY\"" >>$env_header_file
+    fi
 fi
 
 # List of base packages to check for
