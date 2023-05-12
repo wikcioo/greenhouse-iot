@@ -1,6 +1,7 @@
 #include "hardware_controller.h"
 
 #include <message_buffer.h>
+#include <status_leds.h>
 #include <stdio.h>
 
 #include "co2.h"
@@ -84,20 +85,32 @@ void hc_toggle_handler_task(void *pvParameters)
     }
 }
 
-static void _warn_if_measurement_outside_range(const char *name, uint16_t measurement, range_t range)
+static void _warn_if_measurement_outside_range(const char *name, uint16_t measurement, range_t range, status_leds_t led)
 {
     if (measurement < range.low || measurement > range.high)
     {
         printf(
             "[warning]: %s measurement (%u) is outside of range [%u, %u]\n", name, measurement, range.low, range.high);
+
+        status_leds_fastBlink(led);
+    }
+    else
+    {
+        status_leds_ledOff(led);
     }
 }
 
+/*
+ *  The following led configuration is used:
+ *  ST4 (Blue)  : for temperature outside of preset range
+ *  ST3 (Yellow): for humidity outside of preset range
+ *  ST2 (Green) : for co2 outside of preset range
+ */
 static void _handle_measurements_outside_range(uint16_t temp, uint16_t hum, uint16_t co2)
 {
-    _warn_if_measurement_outside_range("temperature", temp, temp_range);
-    _warn_if_measurement_outside_range("humidity", hum, hum_range);
-    _warn_if_measurement_outside_range("co2", co2, co2_range);
+    _warn_if_measurement_outside_range("temperature", temp, temp_range, led_ST4);
+    _warn_if_measurement_outside_range("humidity", hum, hum_range, led_ST3);
+    _warn_if_measurement_outside_range("co2", co2, co2_range, led_ST2);
 }
 
 void hc_handler_task(void *pvParameters)
