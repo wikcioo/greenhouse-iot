@@ -11,7 +11,7 @@ TEST_SRC_DIR      := src
 FFF_DIR           := vendor
 BUILD_DIR         := build
 
-CFLAGS   := -c -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR)
+CFLAGS   := -c -DTEST_ENV -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR)
 CXXFLAGS := -c -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR) -I$(FFF_DIR)
 LDFLAGS  := -lgtest -lpthread
 
