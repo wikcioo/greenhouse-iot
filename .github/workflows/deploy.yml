@@ -19,7 +19,7 @@ jobs:
      - name: Make configure.sh executable
        run: chmod +x configure.sh
      - name: Configure
-       run: ./configure.sh -c
+       run: ./configure.sh -c ${{ secrets.LORA_APP_KEY }} ${{ secrets.LORA_APP_EUI }}
      - name: Build
        run: make        
      - name: Push to server
