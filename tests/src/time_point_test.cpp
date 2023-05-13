@@ -70,3 +70,93 @@ TEST(time_point, TimeOutsideBoundsReturnsFalse)
 
     EXPECT_EQ(result, false);
 }
+
+TEST(time_point, EarlierTimeIsBeforeLaterTime)
+{
+    time_point_t before = {.hour = 8, .minute = 40};
+    time_point_t after  = {.hour = 9, .minute = 0};
+
+    bool result = time_is_before(&before, &after);
+
+    EXPECT_EQ(result, true);
+}
+
+TEST(time_point, LaterTimeIsNotBeforeEarlierTime)
+{
+    time_point_t before = {.hour = 8, .minute = 40};
+    time_point_t after  = {.hour = 7, .minute = 40};
+
+    bool result = time_is_before(&before, &after);
+
+    EXPECT_EQ(result, false);
+}
+
+TEST(time_point, SameTimeIsNotBeforeOther)
+{
+    time_point_t before = {.hour = 8, .minute = 40};
+    time_point_t after  = {.hour = 8, .minute = 40};
+
+    bool result = time_is_before(&before, &after);
+
+    EXPECT_EQ(result, false);
+}
+
+TEST(time_point, DiffInTimeNormal1)
+{
+    time_point_t t1 = {.hour = 8, .minute = 40};
+    time_point_t t2 = {.hour = 9, .minute = 45};
+
+    uint16_t result = time_get_diff_in_minutes(&t1, &t2);
+
+    EXPECT_EQ(result, 65);
+}
+
+TEST(time_point, DiffInTimeNormal2)
+{
+    time_point_t t1 = {.hour = 7, .minute = 10};
+    time_point_t t2 = {.hour = 12, .minute = 19};
+
+    uint16_t result = time_get_diff_in_minutes(&t1, &t2);
+
+    EXPECT_EQ(result, 309);
+}
+
+TEST(time_point, DiffInTimeT1AfterT2)
+{
+    time_point_t t1 = {.hour = 11, .minute = 10};
+    time_point_t t2 = {.hour = 10, .minute = 45};
+
+    uint16_t result = time_get_diff_in_minutes(&t1, &t2);
+
+    EXPECT_EQ(result, 25);
+}
+
+TEST(time_point, DiffInTimeSameTime)
+{
+    time_point_t t1 = {.hour = 8, .minute = 40};
+    time_point_t t2 = {.hour = 8, .minute = 40};
+
+    uint16_t result = time_get_diff_in_minutes(&t1, &t2);
+
+    EXPECT_EQ(result, 0);
+}
+
+TEST(time_point, DiffUntilMidnight1)
+{
+    time_point_t t1 = {.hour = 20, .minute = 40};
+    time_point_t t2 = {.hour = 24, .minute = 0};
+
+    uint16_t result = time_get_diff_in_minutes(&t1, &t2);
+
+    EXPECT_EQ(result, 200);
+}
+
+TEST(time_point, DiffUntilMidnight2)
+{
+    time_point_t t1 = {.hour = 5, .minute = 16};
+    time_point_t t2 = {.hour = 24, .minute = 0};
+
+    uint16_t result = time_get_diff_in_minutes(&t1, &t2);
+
+    EXPECT_EQ(result, 1124);
+}
