@@ -38,7 +38,7 @@ TEST(time_point, TimeOnStartBoundReturnsTrue)
     EXPECT_EQ(result, true);
 }
 
-TEST(time_point, TimeOnEndBoundReturnsTrue)
+TEST(time_point, TimeOnEndBoundReturnsFalse)
 {
     time_point_t time_checked = {.hour = 3, .minute = 40};
     time_point_t start        = {.hour = 1, .minute = 35};
@@ -46,10 +46,10 @@ TEST(time_point, TimeOnEndBoundReturnsTrue)
 
     bool result = time_is_between(&time_checked, &start, &end);
 
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
-TEST(time_point, TimeOnTightBoundsReturnsTrue)
+TEST(time_point, TimeOnTightBoundsReturnsFalse)
 {
     time_point_t time_checked = {.hour = 3, .minute = 40};
     time_point_t start        = {.hour = 3, .minute = 40};
@@ -57,7 +57,7 @@ TEST(time_point, TimeOnTightBoundsReturnsTrue)
 
     bool result = time_is_between(&time_checked, &start, &end);
 
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 TEST(time_point, TimeOutsideBoundsReturnsFalse)
