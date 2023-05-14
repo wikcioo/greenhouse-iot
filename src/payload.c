@@ -1,8 +1,8 @@
+#include "payload.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "payload.h"
 
 static uint8_t *hex_str_to_u8_ptr(const char *hex_str)
 {

@@ -1,7 +1,7 @@
+#include "co2.h"
+
 #include <mh_z19.h>
 #include <stdio.h>
-
-#include "co2.h"
 
 #define CO2_RET_CODE_TO_NAME(x) (x == 0 ? "OK" : x == 1 ? "NO MEASUREMENT" : x == 2 ? "NO SERIAL" : "PPM MUST BE > 99")
 
