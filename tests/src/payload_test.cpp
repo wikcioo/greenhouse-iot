@@ -248,3 +248,90 @@ TEST(payload, UnpackingUpperBounds)
     EXPECT_EQ(co2_range.low, 8191);
     EXPECT_EQ(co2_range.high, 8191);
 }
+
+TEST(payload, UnpackingIntervals0)
+{
+    // 0x08 -> 0b00001000 -> ID: 2
+    uint8_t    data[]       = {0x8};
+    uint8_t    length       = 1;
+    interval_t intervals[7] = {0};
+
+    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS);
+    payload_unpack_intervals(data, length, intervals);
+
+    EXPECT_EQ(intervals[0].start.hour, 0);
+    EXPECT_EQ(intervals[0].start.minute, 0);
+    EXPECT_EQ(intervals[0].end.hour, 0);
+    EXPECT_EQ(intervals[0].end.minute, 0);
+}
+
+TEST(payload, UnpackingIntervals1)
+{
+    // ID: 2
+    // [0] -> Start: 12:37 -> End: 13:27
+    uint8_t    data[]       = {0x9, 0x92, 0xB5, 0xB0};
+    uint8_t    length       = 7;
+    interval_t intervals[7] = {0};
+
+    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS);
+    payload_unpack_intervals(data, length, intervals);
+
+    EXPECT_EQ(intervals[0].start.hour, 12);
+    EXPECT_EQ(intervals[0].start.minute, 37);
+    EXPECT_EQ(intervals[0].end.hour, 13);
+    EXPECT_EQ(intervals[0].end.minute, 27);
+}
+
+TEST(payload, UnpackingIntervals7)
+{
+    // ID: 2
+    uint8_t    data[]       = {0x0A, 0x4F, 0x4C, 0x2A, 0x99, 0x5B, 0xD7, 0x1A, 0xE8, 0x60,
+                               0x0C, 0x29, 0xA6, 0xB4, 0xF7, 0x83, 0x05, 0x22, 0x64, 0xB6};
+    uint8_t    length       = 20;
+    interval_t intervals[7] = {0};
+
+    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS);
+    payload_unpack_intervals(data, length, intervals);
+
+    //  [0]: 18:30 -> 19:02
+    EXPECT_EQ(intervals[0].start.hour, 18);
+    EXPECT_EQ(intervals[0].start.minute, 30);
+    EXPECT_EQ(intervals[0].end.hour, 19);
+    EXPECT_EQ(intervals[0].end.minute, 2);
+
+    //  [1]: 21:12 -> 21:47
+    EXPECT_EQ(intervals[1].start.hour, 21);
+    EXPECT_EQ(intervals[1].start.minute, 12);
+    EXPECT_EQ(intervals[1].end.hour, 21);
+    EXPECT_EQ(intervals[1].end.minute, 47);
+
+    //  [2]: 11:35 -> 11:40
+    EXPECT_EQ(intervals[2].start.hour, 11);
+    EXPECT_EQ(intervals[2].start.minute, 35);
+    EXPECT_EQ(intervals[2].end.hour, 11);
+    EXPECT_EQ(intervals[2].end.minute, 40);
+
+    //  [3]: 12:00 -> 12:10
+    EXPECT_EQ(intervals[3].start.hour, 12);
+    EXPECT_EQ(intervals[3].start.minute, 0);
+    EXPECT_EQ(intervals[3].end.hour, 12);
+    EXPECT_EQ(intervals[3].end.minute, 10);
+
+    //  [4]: 13:13 -> 13:15
+    EXPECT_EQ(intervals[4].start.hour, 13);
+    EXPECT_EQ(intervals[4].start.minute, 13);
+    EXPECT_EQ(intervals[4].end.hour, 13);
+    EXPECT_EQ(intervals[4].end.minute, 15);
+
+    //  [5]: 15:01 -> 16:20
+    EXPECT_EQ(intervals[5].start.hour, 15);
+    EXPECT_EQ(intervals[5].start.minute, 1);
+    EXPECT_EQ(intervals[5].end.hour, 16);
+    EXPECT_EQ(intervals[5].end.minute, 20);
+
+    //  [6]: 17:12 -> 18:54
+    EXPECT_EQ(intervals[6].start.hour, 17);
+    EXPECT_EQ(intervals[6].start.minute, 12);
+    EXPECT_EQ(intervals[6].end.hour, 18);
+    EXPECT_EQ(intervals[6].end.minute, 54);
+}
