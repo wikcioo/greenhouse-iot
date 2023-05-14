@@ -2,6 +2,8 @@
 
 #include "FreeRTOS.h"
 
+#define taskYIELD()
+
 typedef void *TaskHandle_t;
 typedef void (*TaskFunction_t)(void *);
 typedef size_t TaskStatus_t;

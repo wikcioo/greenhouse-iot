@@ -1,8 +1,10 @@
-#include <ATMEGA_FreeRTOS.h>
+#include "lorawan.h"
+
 #include <lora_driver.h>
 #include <status_leds.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <task.h>
 
 #include "env.h"
 #include "hardware_controller.h"
@@ -13,11 +15,6 @@ extern MessageBufferHandle_t downLinkMessageBufferHandle;
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
 extern EventGroupHandle_t    xCreatedEventGroup;
-
-void uplink_handler_task(void *pvParameters);
-void downlink_handler_task(void *pvParameters);
-
-static void _lora_setup(void);
 
 void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_priority)
 {
@@ -33,7 +30,7 @@ void uplink_handler_task(void *pvParameters)
     vTaskDelay(150);
 
     lora_driver_flushBuffers();
-    _lora_setup();
+    lora_setup();
 
     for (;;)
     {
@@ -102,7 +99,7 @@ void downlink_handler_task(void *pvParameters)
     }
 }
 
-static void _lora_setup(void)
+void lora_setup(void)
 {
     char                     _out_buf[20];
     lora_driver_returnCode_t rc;
