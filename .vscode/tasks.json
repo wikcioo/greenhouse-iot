@@ -65,6 +65,15 @@
             }
         },
         {
+            "label": "Clean Build and Run Tests",
+            "type": "shell",
+            "command": "make clean_test; make test; ./tests/build/gtest_tests",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Start GDB Server",
             "type": "shell",
             "command": "avarice -4 -P atmega2560 -j usb :4242",
