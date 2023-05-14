@@ -335,3 +335,87 @@ TEST(payload, UnpackingIntervals7)
     EXPECT_EQ(intervals[6].end.hour, 18);
     EXPECT_EQ(intervals[6].end.minute, 54);
 }
+
+TEST(payload, UnpackingMaxIntervals)
+{
+    // ID: 2
+    uint8_t    data[]       = {0x0B, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint8_t    length       = 20;
+    interval_t intervals[7] = {0};
+
+    payload_unpack_intervals(data, length, intervals);
+    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS);
+
+    // [0]: 31:63 -> 31:61
+    EXPECT_EQ(intervals[0].start.hour, 31);
+    EXPECT_EQ(intervals[0].start.minute, 63);
+    EXPECT_EQ(intervals[0].end.hour, 31);
+    EXPECT_EQ(intervals[0].end.minute, 63);
+
+    // [1]: 31:63 -> 31:61
+    EXPECT_EQ(intervals[1].start.hour, 31);
+    EXPECT_EQ(intervals[1].start.minute, 63);
+    EXPECT_EQ(intervals[1].end.hour, 31);
+    EXPECT_EQ(intervals[1].end.minute, 63);
+
+    // [2]: 31:63 -> 31:61
+    EXPECT_EQ(intervals[2].start.hour, 31);
+    EXPECT_EQ(intervals[2].start.minute, 63);
+    EXPECT_EQ(intervals[2].end.hour, 31);
+    EXPECT_EQ(intervals[2].end.minute, 63);
+
+    // [3]: 31:63 -> 31:61
+    EXPECT_EQ(intervals[3].start.hour, 31);
+    EXPECT_EQ(intervals[3].start.minute, 63);
+    EXPECT_EQ(intervals[3].end.hour, 31);
+    EXPECT_EQ(intervals[3].end.minute, 63);
+
+    // [4]: 31:63 -> 31:61
+    EXPECT_EQ(intervals[4].start.hour, 31);
+    EXPECT_EQ(intervals[4].start.minute, 63);
+    EXPECT_EQ(intervals[4].end.hour, 31);
+    EXPECT_EQ(intervals[4].end.minute, 63);
+
+    // [5]: 31:63 -> 31:61
+    EXPECT_EQ(intervals[5].start.hour, 31);
+    EXPECT_EQ(intervals[5].start.minute, 63);
+    EXPECT_EQ(intervals[5].end.hour, 31);
+    EXPECT_EQ(intervals[5].end.minute, 63);
+
+    // [6]: 31:63 -> 31:61
+    EXPECT_EQ(intervals[6].start.hour, 31);
+    EXPECT_EQ(intervals[6].start.minute, 63);
+    EXPECT_EQ(intervals[6].end.hour, 31);
+    EXPECT_EQ(intervals[6].end.minute, 63);
+}
+
+TEST(payload, UnpackingEmptyIntervals)
+{
+    // ID: 2
+    uint8_t    data[]       = {0x08, 0x00, 0x00, 0x00};
+    uint8_t    length       = 4;
+    interval_t intervals[7] = {0};
+
+    /*
+        The objective of this test is to verify that
+        method correctly unpacks values (even if the
+        data is just zeroes), therefore, index 0 of
+        intervals will be populated prior to unpacking
+        with data different from 0.
+    */
+
+    intervals[0].start.hour   = 10;
+    intervals[0].start.minute = 11;
+    intervals[0].end.hour     = 12;
+    intervals[0].end.minute   = 13;
+
+    payload_unpack_intervals(data, length, intervals);
+    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS);
+
+    // [0]: 0:00 -> 0:00
+    EXPECT_EQ(intervals[0].start.hour, 0);
+    EXPECT_EQ(intervals[0].start.minute, 0);
+    EXPECT_EQ(intervals[0].end.hour, 0);
+    EXPECT_EQ(intervals[0].end.minute, 0);
+}
