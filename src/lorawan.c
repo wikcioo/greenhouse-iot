@@ -1,8 +1,10 @@
-#include <ATMEGA_FreeRTOS.h>
+#include "lorawan.h"
+
 #include <lora_driver.h>
 #include <status_leds.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <task.h>
 
 #include "env.h"
 #include "hardware_controller.h"
@@ -10,12 +12,9 @@
 
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t downLinkMessageBufferHandle;
+extern MessageBufferHandle_t intervalDataMessageBufferHandle;
+extern MessageBufferHandle_t presetDataMessageBufferHandle;
 extern EventGroupHandle_t    xCreatedEventGroup;
-
-void uplink_handler_task(void *pvParameters);
-void downlink_handler_task(void *pvParameters);
-
-static void _lora_setup(void);
 
 void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_priority)
 {
@@ -31,14 +30,20 @@ void uplink_handler_task(void *pvParameters)
     vTaskDelay(150);
 
     lora_driver_flushBuffers();
-    _lora_setup();
+    lora_setup();
 
     for (;;)
     {
         sensor_data_t data;
         xMessageBufferReceive(upLinkMessageBufferHandle, &data, sizeof(sensor_data_t), portMAX_DELAY);
 
-        payload_uplink_t packed_payload = payload_pack_thc(0xE0, data.temp, data.hum, data.co2);
+        // TODO: Unhardcode 0xE0
+        uint8_t flags = 0xE0;
+        if (data.is_water_valve_open)
+        {
+            flags |= 1 << 0;
+        }
+        payload_uplink_t packed_payload = payload_pack_thc(flags, data.temp, data.hum, data.co2);
 
         lora_driver_payload_t _uplink_payload;
         _uplink_payload.len    = packed_payload.length;
@@ -67,16 +72,34 @@ void downlink_handler_task(void *pvParameters)
 
         printf("DOWN LINK: from port: %d with %d bytes received!\n", downlinkPayload.portNo, downlinkPayload.len);
 
-        printf("Payload id = %d\n", payload_get_id_u8_ptr(downlinkPayload.bytes));
+        payload_id_t payload_id = payload_get_id_u8_ptr(downlinkPayload.bytes);
+        printf("Payload name = %s\n", PAYLOAD_ID_TO_NAME(payload_id));
 
-        if (payload_get_id_u8_ptr(downlinkPayload.bytes) == ACTIONS)
+        if (payload_id == ACTIONS)
         {
             xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+        }
+        else if (payload_id == INTERVALS)
+        {
+            interval_t intervals[7] = {0};
+            payload_unpack_intervals(downlinkPayload.bytes, downlinkPayload.len, intervals);
+            for (uint8_t i = 0; i < (downlinkPayload.len + 1) / 3; i++)
+            {
+                xMessageBufferSend(intervalDataMessageBufferHandle, &(intervals[i]), sizeof(interval_t), portMAX_DELAY);
+            }
+        }
+        else if (payload_id == THC_PRESETS)
+        {
+            range_t temp_range, hum_range, co2_range;
+            payload_unpack_thc_presets_u8_ptr(downlinkPayload.bytes, &temp_range, &hum_range, &co2_range);
+
+            preset_data_t data = {&temp_range, &hum_range, &co2_range};
+            xMessageBufferSend(presetDataMessageBufferHandle, (void *) &data, sizeof(preset_data_t), portMAX_DELAY);
         }
     }
 }
 
-static void _lora_setup(void)
+void lora_setup(void)
 {
     char                     _out_buf[20];
     lora_driver_returnCode_t rc;

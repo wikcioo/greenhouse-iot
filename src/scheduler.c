@@ -8,7 +8,7 @@
 #include "payload.h"
 #include "water_controller.h"
 
-#define MAX_INTERVALS 14
+#define MAX_INTERVALS 7
 
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
 
@@ -18,6 +18,12 @@ typedef struct
     uint8_t    current_size;
 } interval_info_t;
 
+typedef struct
+{
+    bool    status;
+    uint8_t index;
+} daily_time_interval_info_t;
+
 static interval_info_t interval_info = {.intervals = {0}, .current_size = 0};
 static time_point_t    daily_time    = {0, 0};
 
@@ -25,8 +31,8 @@ void scheduler_receive_data_handler_task(void *pvParameters);
 void scheduler_schedule_events_handler_task(void *pvParameters);
 void vTimerCallback(TimerHandle_t xTimer);
 
-static bool _is_daily_time_in_interval_array();
-static void _debug_print_intervals();
+static daily_time_interval_info_t _is_daily_time_in_interval_array();
+static void                       _debug_print_intervals();
 
 void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t scheduler_priority)
 {
@@ -34,11 +40,16 @@ void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t
     daily_time.hour   = 5;
     daily_time.minute = 10;
 
-    interval_t temp_interval1 = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 12}};
-    interval_t temp_interval2 = {.start = {.hour = 5, .minute = 14}, .end = {.hour = 5, .minute = 16}};
+    interval_t temp_interval = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 12}};
 
-    interval_info.intervals[interval_info.current_size++] = temp_interval1;
-    interval_info.intervals[interval_info.current_size++] = temp_interval2;
+    interval_info.intervals[interval_info.current_size++] = temp_interval;
+
+    temp_interval.start.hour   = 5;
+    temp_interval.start.minute = 14;
+    temp_interval.end.hour     = 24;
+    temp_interval.end.minute   = 0;
+
+    interval_info.intervals[interval_info.current_size++] = temp_interval;
     /* ========================================= */
 
     xTaskCreate(
@@ -71,15 +82,15 @@ void scheduler_receive_data_handler_task(void *pvParameters)
     }
 }
 
-static bool _is_daily_time_in_interval_array()
+static daily_time_interval_info_t _is_daily_time_in_interval_array()
 {
     for (uint8_t i = 0; i < interval_info.current_size; i++)
     {
         if (time_is_between(&daily_time, &interval_info.intervals[i].start, &interval_info.intervals[i].end))
-            return true;
+            return (daily_time_interval_info_t){.index = i, .status = true};
     }
 
-    return false;
+    return (daily_time_interval_info_t){.index = -1, .status = false};
 }
 
 static void _debug_print_intervals()
@@ -97,11 +108,25 @@ static void _debug_print_intervals()
     puts("}");
 }
 
+static time_point_t _get_next_interval_start_after_daily_time()
+{
+    time_point_t next_interval_start;
+    for (uint8_t i = 0; i < interval_info.current_size; i++)
+    {
+        if (time_is_before(&daily_time, &interval_info.intervals[i].start))
+        {
+            const uint16_t _hour   = interval_info.intervals[i].start.hour;
+            const uint16_t _minute = interval_info.intervals[i].start.minute;
+            next_interval_start    = (time_point_t){_hour, _minute};
+            return next_interval_start;
+        }
+    }
+
+    return (time_point_t){.hour = 24, .minute = 0};
+}
+
 void scheduler_schedule_events_handler_task(void *pvParameters)
 {
-    TickType_t       xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xFrequency    = pdMS_TO_TICKS(1000UL);
-
     TimerHandle_t xTimer = xTimerCreate("MinuteTimer", pdMS_TO_TICKS(60000), pdTRUE, (void *) 0, vTimerCallback);
     xTimerStart(xTimer, 0);
 
@@ -111,9 +136,8 @@ void scheduler_schedule_events_handler_task(void *pvParameters)
 
     for (;;)
     {
-        xTaskDelayUntil(&xLastWakeTime, xFrequency);
-
-        if (_is_daily_time_in_interval_array())
+        daily_time_interval_info_t info = _is_daily_time_in_interval_array();
+        if (info.status)
         {
             if (!water_controller_get_state())
             {
@@ -121,6 +145,20 @@ void scheduler_schedule_events_handler_task(void *pvParameters)
                 printf("Scheduler opened water valve\n");
                 printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
             }
+
+            time_point_t current_interval_end = interval_info.intervals[info.index].end;
+            uint16_t     minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &current_interval_end);
+            uint32_t     ms_to_sleep          = minutes_to_sleep * 60000;
+
+            if (current_interval_end.hour == 24 && current_interval_end.minute == 0)
+            {
+                puts("Sleeping until midnight");
+            }
+
+            printf("Inside sleep %u minutes\n", minutes_to_sleep);
+
+            TickType_t xLastWakeTime = xTaskGetTickCount();
+            xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
         }
         else
         {
@@ -130,6 +168,20 @@ void scheduler_schedule_events_handler_task(void *pvParameters)
                 printf("Scheduler closed water valve\n");
                 printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
             }
+
+            time_point_t next_interval_start = _get_next_interval_start_after_daily_time();
+            uint16_t     minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
+            uint32_t     ms_to_sleep         = minutes_to_sleep * 60000;
+
+            if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
+            {
+                puts("Sleeping until midnight");
+            }
+
+            printf("Outside sleep %u minutes\n", minutes_to_sleep);
+
+            TickType_t xLastWakeTime = xTaskGetTickCount();
+            xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
         }
     }
 }
