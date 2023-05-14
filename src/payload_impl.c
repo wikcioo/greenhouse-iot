@@ -113,3 +113,32 @@ void payload_unpack_actions_u8_ptr(uint8_t *data, action_t *actions)
     actions->interval |= (data[1] & 0x3) << 8;
     actions->interval |= data[2] & 0xFF;
 }
+
+void payload_unpack_intervals(uint8_t *data, uint8_t length, interval_t *intervals)
+{
+    uint8_t start_byte_ref[7] = {0, 3, 6, 9, 11, 14, 16};
+    uint8_t offset_ref[7]     = {6, 4, 2, 0, 6, 4, 10};
+
+    unsigned long tmp;
+    uint16_t      start_time;
+    uint16_t      end_time;
+
+    if (length > 1)
+    {
+        for (uint8_t i = 0; i < ((length + 1) / 3); i++)
+        {
+            tmp =
+                (((unsigned long) data[start_byte_ref[i]] << 24) | ((unsigned long) data[start_byte_ref[i] + 1] << 16) |
+                 ((unsigned long) data[start_byte_ref[i] + 2] << 8) | data[start_byte_ref[i] + 3])
+                << offset_ref[i];
+
+            start_time = (tmp & 0xFFE00000) >> 21;
+            end_time   = (tmp & 0x1FFC00) >> 10;
+
+            intervals[i].start.hour   = (start_time >> 6) & 0x1F;
+            intervals[i].start.minute = start_time & 0x3F;
+            intervals[i].end.hour     = (end_time >> 6) & 0x1F;
+            intervals[i].end.minute   = end_time & 0x3F;
+        }
+    }
+}
