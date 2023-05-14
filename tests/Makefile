@@ -16,7 +16,7 @@ CXXFLAGS := -c -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR) -I$(FF
 LDFLAGS  := -lgtest -lpthread
 
 # Add user source files you want to test to C_FILES variable
-C_FILES   := payload.c time_point.c co2.c humidity_temperature.c
+C_FILES   := payload.c time_point.c co2.c humidity_temperature.c lorawan.c
 C_SOURCES := $(addprefix $(USER_CODE_SRC_DIR)/, $(C_FILES))
 
 CPP_SOURCES += $(wildcard $(MOCKS_DIR)/*.cpp)
