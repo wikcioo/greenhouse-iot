@@ -27,8 +27,6 @@ typedef struct
 static interval_info_t interval_info = {.intervals = {0}, .current_size = 0};
 static time_point_t    daily_time    = {0, 0};
 
-void scheduler_receive_data_handler_task(void *pvParameters);
-void scheduler_schedule_events_handler_task(void *pvParameters);
 void vTimerCallback(TimerHandle_t xTimer);
 
 static daily_time_interval_info_t _is_daily_time_in_interval_array();
@@ -60,25 +58,30 @@ void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t
         scheduler_priority, NULL);
 }
 
+void scheduler_receive_data_handler_task_run(void)
+{
+    interval_t data;
+    xMessageBufferReceive(intervalDataMessageBufferHandle, &data, sizeof(interval_t), portMAX_DELAY);
+    printf(
+        "Received new interval {\n\tStart = %d:%d\n\tEnd = %d%d\n}\n", data.start.hour, data.start.minute,
+        data.end.hour, data.end.minute);
+
+    if (data.start.hour == 0 && data.start.minute == 0 && data.end.hour == 0 && data.end.minute == 0)
+    {
+        // Reset the intervals
+        memset(interval_info.intervals, 0, interval_info.current_size);
+        interval_info.current_size = 0;
+    }
+
+    interval_info.intervals[interval_info.current_size++] = data;
+    _debug_print_intervals();
+}
+
 void scheduler_receive_data_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        interval_t data;
-        xMessageBufferReceive(intervalDataMessageBufferHandle, &data, sizeof(interval_t), portMAX_DELAY);
-        printf(
-            "Received new interval {\n\tStart = %d:%d\n\tEnd = %d%d\n}\n", data.start.hour, data.start.minute,
-            data.end.hour, data.end.minute);
-
-        if (data.start.hour == 0 && data.start.minute == 0 && data.end.hour == 0 && data.end.minute == 0)
-        {
-            // Reset the intervals
-            memset(interval_info.intervals, 0, interval_info.current_size);
-            interval_info.current_size = 0;
-        }
-
-        interval_info.intervals[interval_info.current_size++] = data;
-        _debug_print_intervals();
+        scheduler_receive_data_handler_task_run();
     }
 }
 
