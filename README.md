@@ -5,6 +5,24 @@
 ![Clang Format Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/clang-format-check.yml/badge.svg)
 ![Deploy Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/deploy.yml/badge.svg)
 
+# Introduction
+
+Welcome to the README for the Greenhouse Environment Monitoring System! This project focuses on developing an Internet of Things (IoT) device firmware using FreeRTOS on the AVR2560 MCU platform. The purpose of this firmware is to control the greenhouse environment, ensuring optimal conditions for plant growth and cultivation.
+
+The SEP4 Greenhouse Environment Monitoring System is a collaborative effort by three teams: frontend, backend, and iot. Each team plays a crucial role in the development and operation of the system, working together to create a seamless user experience and efficient control mechanisms.
+
+### Repository Links
+
+To access the repositories for the different components of the SEP4 Greenhouse Environment Monitoring System, please use the following links:
+
+- [frontend](https://github.com/ham222/greenhouse-frontend)<br/>
+- [backend](https://github.com/xoxkoo/greenhouse-backend)
+- [iot](https://github.com/wikcioo/greenhouse-iot)
+
+### System Overview
+
+![System Overview](docs/images/sep4-system-overview.png)
+
 # Setup development environment on Windows
 1. Install VirtualBox [here](https://www.virtualbox.org/wiki/Downloads)
 2. Download Debian based Linux iso like [Ubuntu](https://ubuntu.com/download) or [Beryllium](https://www.bunsenlabs.org/installation.html)
