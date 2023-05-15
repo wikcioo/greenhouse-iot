@@ -128,18 +128,8 @@ static time_point_t _get_next_interval_start_after_daily_time()
     return (time_point_t){.hour = 24, .minute = 0};
 }
 
-void scheduler_schedule_events_handler_task(void *pvParameters)
-{
-    TimerHandle_t xTimer = xTimerCreate("MinuteTimer", pdMS_TO_TICKS(60000), pdTRUE, (void *) 0, vTimerCallback);
-    xTimerStart(xTimer, 0);
-
-    // TODO: Get rid of 2500 ms delay and make printf use mutex
-    vTaskDelay(pdMS_TO_TICKS(2500));
-    _debug_print_intervals();
-
-    for (;;)
-    {
-        daily_time_interval_info_t info = _is_daily_time_in_interval_array();
+void scheduler_schedule_events_handler_task_run(void){
+ daily_time_interval_info_t info = _is_daily_time_in_interval_array();
         if (info.status)
         {
             if (!water_controller_get_state())
@@ -186,6 +176,20 @@ void scheduler_schedule_events_handler_task(void *pvParameters)
             TickType_t xLastWakeTime = xTaskGetTickCount();
             xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
         }
+}
+
+void scheduler_schedule_events_handler_task(void *pvParameters)
+{
+    TimerHandle_t xTimer = xTimerCreate("MinuteTimer", pdMS_TO_TICKS(60000), pdTRUE, (void *) 0, vTimerCallback);
+    xTimerStart(xTimer, 0);
+
+    // TODO: Get rid of 2500 ms delay and make printf use mutex
+    vTaskDelay(pdMS_TO_TICKS(2500));
+    _debug_print_intervals();
+
+    for (;;)
+    {
+       scheduler_schedule_events_handler_task_run();
     }
 }
 
