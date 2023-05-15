@@ -69,20 +69,25 @@ void hc_receive_preset_data_handler_task(void *pvParameters)
     }
 }
 
+void hc_toggle_handler_task_run(void)
+{
+    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
+    puts("Toggling water with event groups\n");
+    if (water_controller_get_state())
+    {
+        water_controller_off();
+    }
+    else
+    {
+        water_controller_on();
+    }
+}
+
 void hc_toggle_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
-        puts("Toggling water with event groups\n");
-        if (water_controller_get_state())
-        {
-            water_controller_off();
-        }
-        else
-        {
-            water_controller_on();
-        }
+        hc_toggle_handler_task_run();
     }
 }
 
