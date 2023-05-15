@@ -16,10 +16,6 @@ static range_t temp_range;
 static range_t hum_range;
 static range_t co2_range;
 
-void hc_receive_preset_data_handler_task(void *pvParameters);
-void hc_toggle_handler_task(void *pvParameters);
-void hc_handler_task(void *pvParameters);
-
 static void _print_preset_data()
 {
     printf(
@@ -48,6 +44,19 @@ void hc_handler_initialise(
     xTaskCreate(hc_handler_task, "Hardware Controller", configMINIMAL_STACK_SIZE, NULL, measurement_priority, NULL);
 }
 
+void hc_receive_preset_data_handler_task_run(void)
+{
+    preset_data_t data;
+    xMessageBufferReceive(presetDataMessageBufferHandle, &data, sizeof(preset_data_t), portMAX_DELAY);
+
+    temp_range = *data.temp_range;
+    hum_range  = (range_t){data.hum_range->low * 10, data.hum_range->high * 10};
+    co2_range  = *data.co2_range;
+
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    _print_preset_data();
+}
+
 void hc_receive_preset_data_handler_task(void *pvParameters)
 {
     // TODO: Replace delay with printf with mutexes
@@ -56,15 +65,7 @@ void hc_receive_preset_data_handler_task(void *pvParameters)
 
     for (;;)
     {
-        preset_data_t data;
-        xMessageBufferReceive(presetDataMessageBufferHandle, &data, sizeof(preset_data_t), portMAX_DELAY);
-
-        temp_range = *data.temp_range;
-        hum_range  = (range_t){data.hum_range->low * 10, data.hum_range->high * 10};
-        co2_range  = *data.co2_range;
-
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        _print_preset_data();
+        hc_receive_preset_data_handler_task_run();
     }
 }
 
