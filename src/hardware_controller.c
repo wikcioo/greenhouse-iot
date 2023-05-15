@@ -119,6 +119,29 @@ static void _handle_measurements_outside_range(uint16_t temp, uint16_t hum, uint
     _warn_if_measurement_outside_range("co2", co2, co2_range, led_ST2);
 }
 
+void hc_handler_task_run(uint8_t counter)
+{
+    co2_measure();
+    hum_temp_measure();
+
+    uint16_t temp = get_last_temperature_measurement();
+    uint16_t hum  = get_last_humidity_measurement();
+    uint16_t co2  = co2_get_latest_measurement();
+
+    printf("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
+
+    _handle_measurements_outside_range(temp, hum, co2);
+
+    if (counter == 5)
+    {
+        sensor_data_t data = {water_controller_get_state(), temp, hum, co2};
+
+        // TODO: Add error handling
+        xMessageBufferSend(upLinkMessageBufferHandle, (void *) &data, sizeof(sensor_data_t), portMAX_DELAY);
+
+        counter = 0;
+    }
+}
 void hc_handler_task(void *pvParameters)
 {
     TickType_t       xLastWakeTime = xTaskGetTickCount();
@@ -128,26 +151,10 @@ void hc_handler_task(void *pvParameters)
     for (;;)
     {
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
-
-        co2_measure();
-        hum_temp_measure();
-
-        uint16_t temp = get_last_temperature_measurement();
-        uint16_t hum  = get_last_humidity_measurement();
-        uint16_t co2  = co2_get_latest_measurement();
-
         counter++;
-        printf("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
-
-        _handle_measurements_outside_range(temp, hum, co2);
-
+        hc_handler_task_run(counter);
         if (counter == 5)
         {
-            sensor_data_t data = {water_controller_get_state(), temp, hum, co2};
-
-            // TODO: Add error handling
-            xMessageBufferSend(upLinkMessageBufferHandle, (void *) &data, sizeof(sensor_data_t), portMAX_DELAY);
-
             counter = 0;
         }
     }
