@@ -6,3 +6,5 @@ void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_p
 void uplink_handler_task(void *pvParameters);
 void downlink_handler_task(void *pvParameters);
 void lora_setup(void);
+void uplink_handler_task_run(void);
+void downlink_handler_task_run(void);

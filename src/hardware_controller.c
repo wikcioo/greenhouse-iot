@@ -16,10 +16,6 @@ static range_t temp_range;
 static range_t hum_range;
 static range_t co2_range;
 
-void hc_receive_preset_data_handler_task(void *pvParameters);
-void hc_toggle_handler_task(void *pvParameters);
-void hc_handler_task(void *pvParameters);
-
 static void _print_preset_data()
 {
     printf(
@@ -48,6 +44,19 @@ void hc_handler_initialise(
     xTaskCreate(hc_handler_task, "Hardware Controller", configMINIMAL_STACK_SIZE, NULL, measurement_priority, NULL);
 }
 
+void hc_receive_preset_data_handler_task_run(void)
+{
+    preset_data_t data;
+    xMessageBufferReceive(presetDataMessageBufferHandle, &data, sizeof(preset_data_t), portMAX_DELAY);
+
+    temp_range = *data.temp_range;
+    hum_range  = (range_t){data.hum_range->low * 10, data.hum_range->high * 10};
+    co2_range  = *data.co2_range;
+
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    _print_preset_data();
+}
+
 void hc_receive_preset_data_handler_task(void *pvParameters)
 {
     // TODO: Replace delay with printf with mutexes
@@ -56,15 +65,21 @@ void hc_receive_preset_data_handler_task(void *pvParameters)
 
     for (;;)
     {
-        preset_data_t data;
-        xMessageBufferReceive(presetDataMessageBufferHandle, &data, sizeof(preset_data_t), portMAX_DELAY);
+        hc_receive_preset_data_handler_task_run();
+    }
+}
 
-        temp_range = *data.temp_range;
-        hum_range  = (range_t){data.hum_range->low * 10, data.hum_range->high * 10};
-        co2_range  = *data.co2_range;
-
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        _print_preset_data();
+void hc_toggle_handler_task_run(void)
+{
+    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
+    puts("Toggling water with event groups\n");
+    if (water_controller_get_state())
+    {
+        water_controller_off();
+    }
+    else
+    {
+        water_controller_on();
     }
 }
 
@@ -72,16 +87,7 @@ void hc_toggle_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
-        puts("Toggling water with event groups\n");
-        if (water_controller_get_state())
-        {
-            water_controller_off();
-        }
-        else
-        {
-            water_controller_on();
-        }
+        hc_toggle_handler_task_run();
     }
 }
 
@@ -113,6 +119,29 @@ static void _handle_measurements_outside_range(uint16_t temp, uint16_t hum, uint
     _warn_if_measurement_outside_range("co2", co2, co2_range, led_ST2);
 }
 
+void hc_handler_task_run(uint8_t counter)
+{
+    co2_measure();
+    hum_temp_measure();
+
+    uint16_t temp = get_last_temperature_measurement();
+    uint16_t hum  = get_last_humidity_measurement();
+    uint16_t co2  = co2_get_latest_measurement();
+
+    printf("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
+
+    _handle_measurements_outside_range(temp, hum, co2);
+
+    if (counter == 5)
+    {
+        sensor_data_t data = {water_controller_get_state(), temp, hum, co2};
+
+        // TODO: Add error handling
+        xMessageBufferSend(upLinkMessageBufferHandle, (void *) &data, sizeof(sensor_data_t), portMAX_DELAY);
+
+        counter = 0;
+    }
+}
 void hc_handler_task(void *pvParameters)
 {
     TickType_t       xLastWakeTime = xTaskGetTickCount();
@@ -122,26 +151,10 @@ void hc_handler_task(void *pvParameters)
     for (;;)
     {
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
-
-        co2_measure();
-        hum_temp_measure();
-
-        uint16_t temp = get_last_temperature_measurement();
-        uint16_t hum  = get_last_humidity_measurement();
-        uint16_t co2  = co2_get_latest_measurement();
-
         counter++;
-        printf("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
-
-        _handle_measurements_outside_range(temp, hum, co2);
-
+        hc_handler_task_run(counter);
         if (counter == 5)
         {
-            sensor_data_t data = {water_controller_get_state(), temp, hum, co2};
-
-            // TODO: Add error handling
-            xMessageBufferSend(upLinkMessageBufferHandle, (void *) &data, sizeof(sensor_data_t), portMAX_DELAY);
-
             counter = 0;
         }
     }

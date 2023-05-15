@@ -27,8 +27,6 @@ typedef struct
 static interval_info_t interval_info = {.intervals = {0}, .current_size = 0};
 static time_point_t    daily_time    = {0, 0};
 
-void scheduler_receive_data_handler_task(void *pvParameters);
-void scheduler_schedule_events_handler_task(void *pvParameters);
 void vTimerCallback(TimerHandle_t xTimer);
 
 static daily_time_interval_info_t _is_daily_time_in_interval_array();
@@ -60,25 +58,30 @@ void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t
         scheduler_priority, NULL);
 }
 
+void scheduler_receive_data_handler_task_run(void)
+{
+    interval_t data;
+    xMessageBufferReceive(intervalDataMessageBufferHandle, &data, sizeof(interval_t), portMAX_DELAY);
+    printf(
+        "Received new interval {\n\tStart = %d:%d\n\tEnd = %d%d\n}\n", data.start.hour, data.start.minute,
+        data.end.hour, data.end.minute);
+
+    if (data.start.hour == 0 && data.start.minute == 0 && data.end.hour == 0 && data.end.minute == 0)
+    {
+        // Reset the intervals
+        memset(interval_info.intervals, 0, interval_info.current_size);
+        interval_info.current_size = 0;
+    }
+
+    interval_info.intervals[interval_info.current_size++] = data;
+    _debug_print_intervals();
+}
+
 void scheduler_receive_data_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        interval_t data;
-        xMessageBufferReceive(intervalDataMessageBufferHandle, &data, sizeof(interval_t), portMAX_DELAY);
-        printf(
-            "Received new interval {\n\tStart = %d:%d\n\tEnd = %d%d\n}\n", data.start.hour, data.start.minute,
-            data.end.hour, data.end.minute);
-
-        if (data.start.hour == 0 && data.start.minute == 0 && data.end.hour == 0 && data.end.minute == 0)
-        {
-            // Reset the intervals
-            memset(interval_info.intervals, 0, interval_info.current_size);
-            interval_info.current_size = 0;
-        }
-
-        interval_info.intervals[interval_info.current_size++] = data;
-        _debug_print_intervals();
+        scheduler_receive_data_handler_task_run();
     }
 }
 
@@ -125,6 +128,57 @@ static time_point_t _get_next_interval_start_after_daily_time()
     return (time_point_t){.hour = 24, .minute = 0};
 }
 
+void scheduler_schedule_events_handler_task_run(void)
+{
+    daily_time_interval_info_t info = _is_daily_time_in_interval_array();
+    if (info.status)
+    {
+        if (!water_controller_get_state())
+        {
+            water_controller_on();
+            printf("Scheduler opened water valve\n");
+            printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
+        }
+
+        time_point_t current_interval_end = interval_info.intervals[info.index].end;
+        uint16_t     minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &current_interval_end);
+        uint32_t     ms_to_sleep          = minutes_to_sleep * 60000;
+
+        if (current_interval_end.hour == 24 && current_interval_end.minute == 0)
+        {
+            puts("Sleeping until midnight");
+        }
+
+        printf("Inside sleep %u minutes\n", minutes_to_sleep);
+
+        TickType_t xLastWakeTime = xTaskGetTickCount();
+        xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
+    }
+    else
+    {
+        if (water_controller_get_state())
+        {
+            water_controller_off();
+            printf("Scheduler closed water valve\n");
+            printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
+        }
+
+        time_point_t next_interval_start = _get_next_interval_start_after_daily_time();
+        uint16_t     minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
+        uint32_t     ms_to_sleep         = minutes_to_sleep * 60000;
+
+        if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
+        {
+            puts("Sleeping until midnight");
+        }
+
+        printf("Outside sleep %u minutes\n", minutes_to_sleep);
+
+        TickType_t xLastWakeTime = xTaskGetTickCount();
+        xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
+    }
+}
+
 void scheduler_schedule_events_handler_task(void *pvParameters)
 {
     TimerHandle_t xTimer = xTimerCreate("MinuteTimer", pdMS_TO_TICKS(60000), pdTRUE, (void *) 0, vTimerCallback);
@@ -136,53 +190,7 @@ void scheduler_schedule_events_handler_task(void *pvParameters)
 
     for (;;)
     {
-        daily_time_interval_info_t info = _is_daily_time_in_interval_array();
-        if (info.status)
-        {
-            if (!water_controller_get_state())
-            {
-                water_controller_on();
-                printf("Scheduler opened water valve\n");
-                printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
-            }
-
-            time_point_t current_interval_end = interval_info.intervals[info.index].end;
-            uint16_t     minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &current_interval_end);
-            uint32_t     ms_to_sleep          = minutes_to_sleep * 60000;
-
-            if (current_interval_end.hour == 24 && current_interval_end.minute == 0)
-            {
-                puts("Sleeping until midnight");
-            }
-
-            printf("Inside sleep %u minutes\n", minutes_to_sleep);
-
-            TickType_t xLastWakeTime = xTaskGetTickCount();
-            xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
-        }
-        else
-        {
-            if (water_controller_get_state())
-            {
-                water_controller_off();
-                printf("Scheduler closed water valve\n");
-                printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
-            }
-
-            time_point_t next_interval_start = _get_next_interval_start_after_daily_time();
-            uint16_t     minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
-            uint32_t     ms_to_sleep         = minutes_to_sleep * 60000;
-
-            if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
-            {
-                puts("Sleeping until midnight");
-            }
-
-            printf("Outside sleep %u minutes\n", minutes_to_sleep);
-
-            TickType_t xLastWakeTime = xTaskGetTickCount();
-            xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
-        }
+        scheduler_schedule_events_handler_task_run();
     }
 }
 
