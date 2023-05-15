@@ -1,3 +1,10 @@
+# Greenhouse IoT Device Firmware
+
+![Build Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/build.yml/badge.svg)
+![Test Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/test.yml/badge.svg) 
+![Clang Format Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/clang-format-check.yml/badge.svg)
+![Deploy Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/deploy.yml/badge.svg)
+
 # Remote SSH environment in Visual Studio Code
 
 1. Install Visual Studio Code [here](https://code.visualstudio.com/download).
