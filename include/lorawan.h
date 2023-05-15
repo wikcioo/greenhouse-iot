@@ -7,3 +7,4 @@ void uplink_handler_task(void *pvParameters);
 void downlink_handler_task(void *pvParameters);
 void lora_setup(void);
 void uplink_handler_task_run(void);
+void downlink_handler_task_run(void);

@@ -63,42 +63,44 @@ void uplink_handler_task(void *pvParameters)
         uplink_handler_task_run();
     }
 }
+void downlink_handler_task_run(void)
+{
+    lora_driver_payload_t downlinkPayload;
 
+    xMessageBufferReceive(downLinkMessageBufferHandle, &downlinkPayload, sizeof(lora_driver_payload_t), portMAX_DELAY);
+
+    printf("DOWN LINK: from port: %d with %d bytes received!\n", downlinkPayload.portNo, downlinkPayload.len);
+
+    payload_id_t payload_id = payload_get_id_u8_ptr(downlinkPayload.bytes);
+    printf("Payload name = %s\n", PAYLOAD_ID_TO_NAME(payload_id));
+
+    if (payload_id == ACTIONS)
+    {
+        xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+    }
+    else if (payload_id == INTERVALS)
+    {
+        interval_t intervals[7] = {0};
+        payload_unpack_intervals(downlinkPayload.bytes, downlinkPayload.len, intervals);
+        for (uint8_t i = 0; i < (downlinkPayload.len + 1) / 3; i++)
+        {
+            xMessageBufferSend(intervalDataMessageBufferHandle, &(intervals[i]), sizeof(interval_t), portMAX_DELAY);
+        }
+    }
+    else if (payload_id == THC_PRESETS)
+    {
+        range_t temp_range, hum_range, co2_range;
+        payload_unpack_thc_presets_u8_ptr(downlinkPayload.bytes, &temp_range, &hum_range, &co2_range);
+
+        preset_data_t data = {&temp_range, &hum_range, &co2_range};
+        xMessageBufferSend(presetDataMessageBufferHandle, (void *) &data, sizeof(preset_data_t), portMAX_DELAY);
+    }
+}
 void downlink_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        lora_driver_payload_t downlinkPayload;
-
-        xMessageBufferReceive(
-            downLinkMessageBufferHandle, &downlinkPayload, sizeof(lora_driver_payload_t), portMAX_DELAY);
-
-        printf("DOWN LINK: from port: %d with %d bytes received!\n", downlinkPayload.portNo, downlinkPayload.len);
-
-        payload_id_t payload_id = payload_get_id_u8_ptr(downlinkPayload.bytes);
-        printf("Payload name = %s\n", PAYLOAD_ID_TO_NAME(payload_id));
-
-        if (payload_id == ACTIONS)
-        {
-            xEventGroupSetBits(xCreatedEventGroup, BIT_0);
-        }
-        else if (payload_id == INTERVALS)
-        {
-            interval_t intervals[7] = {0};
-            payload_unpack_intervals(downlinkPayload.bytes, downlinkPayload.len, intervals);
-            for (uint8_t i = 0; i < (downlinkPayload.len + 1) / 3; i++)
-            {
-                xMessageBufferSend(intervalDataMessageBufferHandle, &(intervals[i]), sizeof(interval_t), portMAX_DELAY);
-            }
-        }
-        else if (payload_id == THC_PRESETS)
-        {
-            range_t temp_range, hum_range, co2_range;
-            payload_unpack_thc_presets_u8_ptr(downlinkPayload.bytes, &temp_range, &hum_range, &co2_range);
-
-            preset_data_t data = {&temp_range, &hum_range, &co2_range};
-            xMessageBufferSend(presetDataMessageBufferHandle, (void *) &data, sizeof(preset_data_t), portMAX_DELAY);
-        }
+        downlink_handler_task_run();
     }
 }
 
