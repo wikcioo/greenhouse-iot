@@ -21,7 +21,33 @@ void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_p
     xTaskCreate(uplink_handler_task, "LRUpLink", configMINIMAL_STACK_SIZE + 200, NULL, uplink_priority, NULL);
     xTaskCreate(downlink_handler_task, "LRDownLink", configMINIMAL_STACK_SIZE + 200, NULL, downlink_priority, NULL);
 }
+void uplink_handler_task_run(void)
+{
+    sensor_data_t data;
+    xMessageBufferReceive(upLinkMessageBufferHandle, &data, sizeof(sensor_data_t), portMAX_DELAY);
 
+    // TODO: Unhardcode 0xE0
+    uint8_t flags = 0xE0;
+    if (data.is_water_valve_open)
+    {
+        flags |= 1 << 0;
+    }
+    payload_uplink_t packed_payload = payload_pack_thc(flags, data.temp, data.hum, data.co2);
+
+    lora_driver_payload_t _uplink_payload;
+    _uplink_payload.len    = packed_payload.length;
+    _uplink_payload.portNo = 2;
+
+    for (uint8_t i = 0; i < packed_payload.length; i++)
+    {
+        _uplink_payload.bytes[i] = packed_payload.data[i];
+    }
+
+    status_leds_shortPuls(led_ST4);
+    printf(
+        "Upload Message >%s<\n",
+        lora_driver_mapReturnCodeToText(lora_driver_sendUploadMessage(false, &_uplink_payload)));
+}
 void uplink_handler_task(void *pvParameters)
 {
     lora_driver_resetRn2483(1);
@@ -34,30 +60,7 @@ void uplink_handler_task(void *pvParameters)
 
     for (;;)
     {
-        sensor_data_t data;
-        xMessageBufferReceive(upLinkMessageBufferHandle, &data, sizeof(sensor_data_t), portMAX_DELAY);
-
-        // TODO: Unhardcode 0xE0
-        uint8_t flags = 0xE0;
-        if (data.is_water_valve_open)
-        {
-            flags |= 1 << 0;
-        }
-        payload_uplink_t packed_payload = payload_pack_thc(flags, data.temp, data.hum, data.co2);
-
-        lora_driver_payload_t _uplink_payload;
-        _uplink_payload.len    = packed_payload.length;
-        _uplink_payload.portNo = 2;
-
-        for (uint8_t i = 0; i < packed_payload.length; i++)
-        {
-            _uplink_payload.bytes[i] = packed_payload.data[i];
-        }
-
-        status_leds_shortPuls(led_ST4);
-        printf(
-            "Upload Message >%s<\n",
-            lora_driver_mapReturnCodeToText(lora_driver_sendUploadMessage(false, &_uplink_payload)));
+        uplink_handler_task_run();
     }
 }
 
