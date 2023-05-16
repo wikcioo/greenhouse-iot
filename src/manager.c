@@ -1,5 +1,3 @@
-#include "manager.h"
-
 #include <avr/io.h>
 #include <lora_driver.h>
 #include <message_buffer.h>
@@ -11,6 +9,7 @@
 #include "co2.h"
 #include "hardware_controller.h"
 #include "humidity_temperature.h"
+#include "initialiser.h"
 #include "lorawan.h"
 #include "payload.h"
 #include "scheduler.h"
@@ -22,7 +21,7 @@ MessageBufferHandle_t downLinkMessageBufferHandle;
 MessageBufferHandle_t presetDataMessageBufferHandle;
 EventGroupHandle_t    xCreatedEventGroup;
 
-void initialiseManager()
+void initialiseSystem()
 {
     DDRA |= _BV(DDA0) | _BV(DDA7);
 
