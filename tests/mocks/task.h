@@ -19,7 +19,7 @@ void vTaskDelete(TaskHandle_t xTask);
 
 // Task Control
 void        vTaskDelay(const TickType_t xTicksToDelay);
-void        vTaskDelayUntil(TickType_t *pxPreviousWakeTime, const TickType_t xTimeIncrement);
+BaseType_t  xTaskDelayUntil(TickType_t *pxPreviousWakeTime, const TickType_t xTimeIncrement);
 UBaseType_t uxTaskPriorityGet(TaskHandle_t xTask);
 void        vTaskPrioritySet(TaskHandle_t xTask, UBaseType_t uxNewPriority);
 void        vTaskSuspend(TaskHandle_t xTaskToSuspend);
