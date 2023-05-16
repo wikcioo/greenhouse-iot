@@ -60,8 +60,11 @@ void scheduler_receive_data_handler_task_run(void)
         memset(interval_info.intervals, 0, interval_info.current_size);
         interval_info.current_size = 0;
     }
+    else
+    {
+        interval_info.intervals[interval_info.current_size++] = data;
+    }
 
-    interval_info.intervals[interval_info.current_size++] = data;
     _debug_print_intervals();
 }
 
