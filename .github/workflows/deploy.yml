@@ -1,39 +1,44 @@
 name: Deploy to IOT Server
-
 on:
   push:
     branches:
       - master
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-     - uses: actions/checkout@v3
-       with:
-         submodules: "recursive"
-     - name: Initialize and Update Submodules
-       run: |
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+      - name: Initialize and Update Submodules
+        run: |
           git submodule sync --recursive
           git submodule update --init --recursive
-     - name: Make configure.sh executable
-       run: chmod +x configure.sh
-     - name: Configure
-       run: ./configure.sh -c ${{ secrets.LORA_APP_KEY }} ${{ secrets.LORA_APP_EUI }}
-     - name: Build
-       run: make        
-     - name: Push to server
-       uses: easingthemes/ssh-deploy@v4.1.8
-
-       env:
+      - name: Make configure.sh executable
+        run: chmod +x configure.sh
+      - name: Configure
+        run: ./configure.sh -c ${{ secrets.LORA_APP_KEY }} ${{ secrets.LORA_APP_EUI }}
+      - name: Build
+        run: make
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d.%H:%M')"
+      - name: Push to server
+        uses: easingthemes/ssh-deploy@v4.1.8
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ~/iot-folder/deploy-iot
-       
-       with:
-           source: build/
-           args: "-rlgoDzvc -i"
-           SCRIPT_AFTER: |
-              cd ~/iot-folder/
-              ./flash-deployed-file.sh
+          TARGET: ~/release/${{ steps.date.outputs.date }}
+        with:
+          source: build/
+          args: -rlgoDzvc -i
+          SCRIPT_BEFORE: |
+            mkdir -p ~/release/${{ steps.date.outputs.date }}
+          SCRIPT_AFTER: >
+            rm -v ~/latest/*
+
+            cp  ~/release/${{ steps.date.outputs.date }}/iot_firmware.hex ~/latest
+
+            echo ${{ secrets.PASSWORD }} | sudo -S ./flash-latest-hex.sh
+      
