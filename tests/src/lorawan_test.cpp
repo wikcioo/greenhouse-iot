@@ -61,7 +61,7 @@ class LorawanTest : public ::testing::Test
         RESET_FAKE(status_leds_ledOn);
         RESET_FAKE(status_leds_ledOff);
         RESET_FAKE(status_leds_fastBlink);
-        RESET_FAKE(xTaskCreateStatic);
+        RESET_FAKE(xTaskCreate);
         RESET_FAKE(vTaskDelay);
         RESET_FAKE(xMessageBufferReceive);
         RESET_FAKE(xEventGroupSetBits);
