@@ -8,24 +8,10 @@
 #include "payload.h"
 #include "water_controller.h"
 
-#define MAX_INTERVALS 7
-
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
 
-typedef struct
-{
-    interval_t intervals[MAX_INTERVALS];
-    uint8_t    current_size;
-} interval_info_t;
-
-typedef struct
-{
-    bool    status;
-    uint8_t index;
-} daily_time_interval_info_t;
-
-static interval_info_t interval_info = {.intervals = {0}, .current_size = 0};
-static time_point_t    daily_time    = {0, 0};
+interval_info_t interval_info = {.intervals = {0}, .current_size = 0};
+time_point_t    daily_time    = {0, 0};
 
 void vTimerCallback(TimerHandle_t xTimer);
 
@@ -34,6 +20,7 @@ static void                       _debug_print_intervals();
 
 void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t scheduler_priority)
 {
+#ifndef TEST_ENV
     /* ======= For testing purposes only ======= */
     daily_time.hour   = 5;
     daily_time.minute = 10;
@@ -49,6 +36,7 @@ void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t
 
     interval_info.intervals[interval_info.current_size++] = temp_interval;
     /* ========================================= */
+#endif
 
     xTaskCreate(
         scheduler_receive_data_handler_task, "Scheduler Data Receiver", configMINIMAL_STACK_SIZE, NULL,
@@ -72,8 +60,11 @@ void scheduler_receive_data_handler_task_run(void)
         memset(interval_info.intervals, 0, interval_info.current_size);
         interval_info.current_size = 0;
     }
+    else
+    {
+        interval_info.intervals[interval_info.current_size++] = data;
+    }
 
-    interval_info.intervals[interval_info.current_size++] = data;
     _debug_print_intervals();
 }
 
