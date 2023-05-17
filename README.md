@@ -23,6 +23,39 @@ To access the repositories for the different components of the SEP4 Greenhouse E
 
 ![System Overview](docs/images/sep4-system-overview.png)
 
+# Development environment
+
+Following section describes how to set up your own version of development environment for the project.
+
+## Visual Studio Code
+
+Solution has been designed with preference for Visual Studio Code as the environment for editing, building, flashing or testing, available for all platforms.
+
+This results in particular set of functionalities that include (but are not limited to):
+
+- **Recommended extensions:**\
+  Set of extensions that are recommended projects will be suggested for installation on opening, if not installed.\
+  ![Extensions](docs/images/sep4-vs-extensions.png)
+
+- **Tasks:**\
+  Use `CTRL + Shift + B` to view and execute lifecycle methods.\
+  ![Tasks](docs/images/sep4-vs-tasks.png)
+
+## Setting up
+
+This section describes how to set up the project locally.
+
+Start by cloning the project:\
+```git clone --recursive https://github.com/wikcioo/greenhouse-iot```\
+and continue by following instructions below that correspond to your platform and preferences.
+
+# Setup development environment on Linux
+
+1. Change into cloned repository
+2. Run `./configure.sh` to install required libraries
+
+Setup is complete when the script is finished.
+
 # Setup development environment on Windows
 1. Install VirtualBox [here](https://www.virtualbox.org/wiki/Downloads)
 2. Download Debian based Linux iso like [Ubuntu](https://ubuntu.com/download) or [Beryllium](https://www.bunsenlabs.org/installation.html)
@@ -36,7 +69,7 @@ To access the repositories for the different components of the SEP4 Greenhouse E
 10. Run `sudo sh ./VBoxLinuxAdditions.run`
 11. Reboot
 12. Attach USB Devices by clicking Devices -> USB -> device-name
-13. Follow [this](#) guide to setup the development environment on Linux
+13. Follow [this](#setup-development-environment-on-linux) guide to setup the development environment on Linux
 
 # Remote SSH environment in Visual Studio Code
 
@@ -48,3 +81,23 @@ To access the repositories for the different components of the SEP4 Greenhouse E
 6. Enter the password.
 7. Use the command `git clone --recursive https://github.com/wikcioo/greenhouse-iot.git` to clone the repository.
 8. Use the command `cd greenhouse-iot` to jump in to the project directory.
+
+# Flashing
+
+Alternatively to building the project yourself, you can flash one of the ready ![releases](https://github.com/wikcioo/greenhouse-iot/releases) available.
+
+> Flashing requires configured environment
+
+1. Download and untar latest release from GitHub.
+2. Plug in both Atmel-ICE programmer and Arduino.
+3. Run avrdude with following arguments:
+   ` -v -p m2560 -c atmelice -P usb -U flash:w:/path/to/firmware.hex:i`
+
+# Reading from the device
+
+For reading from the device, there are 2 recommendations:
+
+- **WINDOWS**: Putty
+- **LINUX**: Minicom
+
+Make sure to set **baudrate** to **57600** and **implicit CR in every LF** to **true** (or **Add carriage return** for minicom).
