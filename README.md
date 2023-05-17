@@ -1,7 +1,7 @@
 # Greenhouse IoT Device Firmware
 
 ![Build Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/build.yml/badge.svg)
-![Test Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/test.yml/badge.svg) 
+![Test Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/test.yml/badge.svg)
 ![Clang Format Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/clang-format-check.yml/badge.svg)
 ![Deploy Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/deploy.yml/badge.svg)
 
@@ -41,22 +41,8 @@ This results in particular set of functionalities that include (but are not limi
   Use `CTRL + Shift + B` to view and execute lifecycle methods.\
   ![Tasks](docs/images/sep4-vs-tasks.png)
 
-## Setting up
-
-This section describes how to set up the project locally.
-
-Start by cloning the project:\
-```git clone --recursive https://github.com/wikcioo/greenhouse-iot```\
-and continue by following instructions below that correspond to your platform and preferences.
-
-# Setup development environment on Linux
-
-1. Change into cloned repository
-2. Run `./configure.sh` to install required libraries
-
-Setup is complete when the script is finished.
-
 # Setup development environment on Windows
+
 1. Install VirtualBox [here](https://www.virtualbox.org/wiki/Downloads)
 2. Download Debian based Linux iso like [Ubuntu](https://ubuntu.com/download) or [Beryllium](https://www.bunsenlabs.org/installation.html)
 3. Create and start a new virtual machine
@@ -73,14 +59,24 @@ Setup is complete when the script is finished.
 
 # Remote SSH environment in Visual Studio Code
 
+> Make sure that you have SSH access and are a member of the `dialout` group on the remote server.
+
 1. Install Visual Studio Code [here](https://code.visualstudio.com/download).
-2. Install the [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extension from microsoft.
+2. Install the [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extension from Microsoft.
 3. Press the "Remote Explorer" icon, that is found on the sidebar.
 4. Add new remote by pressing the add button next to SSH dropdown.
 5. Enter `ssh user@domain` in the pop up prompt.
 6. Enter the password.
-7. Use the command `git clone --recursive https://github.com/wikcioo/greenhouse-iot.git` to clone the repository.
-8. Use the command `cd greenhouse-iot` to jump in to the project directory.
+7. Follow [this](#setup-development-environment-on-linux) guide to setup the development environment on Linux
+
+# Setup development environment on Linux
+
+1. Clone the project:\
+   `git clone --recursive https://github.com/wikcioo/greenhouse-iot`
+2. Change into cloned repository
+3. Run `./configure.sh` to install required binaries and export LoRaWAN keys.
+
+Setup is complete when the script is finished.
 
 # Flashing
 
@@ -88,10 +84,10 @@ Alternatively to building the project yourself, you can flash one of the ready !
 
 > Flashing requires configured environment
 
-1. Download and untar latest release from GitHub.
-2. Plug in both Atmel-ICE programmer and Arduino.
-3. Run avrdude with following arguments:
-   ` -v -p m2560 -c atmelice -P usb -U flash:w:/path/to/firmware.hex:i`
+1. Download and extract latest release from GitHub.
+2. Plug in both Atmel-ICE programmer and the device.
+3. Run following to flash:\
+   `avrdude -v -p m2560 -c atmelice -P usb -U flash:w:/path/to/firmware.hex:i`
 
 # Reading from the device
 
