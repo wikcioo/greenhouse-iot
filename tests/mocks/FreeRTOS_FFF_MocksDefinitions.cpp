@@ -18,8 +18,6 @@ DEFINE_FAKE_VALUE_FUNC(
 DEFINE_FAKE_VOID_FUNC(vTaskDelete, TaskHandle_t);
 // void vTaskDelay( const TickType_t xTicksToDelay );
 DEFINE_FAKE_VOID_FUNC(vTaskDelay, TickType_t);
-// void vTaskDelayUntil(TickType_t* pxPreviousWakeTime, const TickType_t xTimeIncrement);
-DEFINE_FAKE_VOID_FUNC(vTaskDelayUntil, TickType_t *, TickType_t);
 // BaseType_t xTaskDelayUntil( TickType_t *pxPreviousWakeTime, const TickType_t xTimeIncrement );
 DEFINE_FAKE_VALUE_FUNC(BaseType_t, xTaskDelayUntil, TickType_t *, TickType_t);
 // TickType_t xTaskGetTickCount(void);
