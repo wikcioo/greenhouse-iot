@@ -161,9 +161,10 @@ void scheduler_schedule_events_handler_task_run(void)
     }
     else
     {
-        next_interval_start = _get_next_interval_start_after_daily_time();
-        minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
-        ms_to_sleep         = minutes_to_sleep * 60000;
+        interval_t current_interval_ = interval_info.intervals[info.index];
+
+        minutes_to_sleep = time_get_diff_in_minutes(&current_interval_.end, &next_interval_start);
+        ms_to_sleep      = minutes_to_sleep * 60000;
 
         if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
         {
@@ -206,13 +207,11 @@ void vTimerCallback(TimerHandle_t xTimer)
     {
         daily_time.hour = 0;
     }
-
 }
 
 // Manuall toggling
 void scheduler_manual_toggling_handler_task_run(void)
 {
- 
     xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
     puts("Toggling water with event groups\n");
 
