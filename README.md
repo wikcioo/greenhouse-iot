@@ -3,7 +3,7 @@
 ![Build Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/build.yml/badge.svg)
 ![Test Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/test.yml/badge.svg)
 ![Clang Format Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/clang-format-check.yml/badge.svg)
-![Deploy Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/deploy.yml/badge.svg)
+![Deploy Workflow](https://github.com/wikcioo/greenhouse-iot/actions/workflows/deploy-and-release.yml/badge.svg)
 
 # Introduction
 
