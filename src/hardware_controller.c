@@ -10,7 +10,7 @@
 
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
-extern EventGroupHandle_t    xCreatedEventGroup;
+// extern EventGroupHandle_t    xCreatedEventGroup;
 
 static range_t temp_range;
 static range_t hum_range;
@@ -23,8 +23,7 @@ static void _print_preset_data()
         temp_range.high, hum_range.low, hum_range.high, co2_range.low, co2_range.high);
 }
 
-void hc_handler_initialise(
-    UBaseType_t preset_data_receive_priority, UBaseType_t measurement_priority, UBaseType_t toggle_priority)
+void hc_handler_initialise(UBaseType_t preset_data_receive_priority, UBaseType_t measurement_priority)
 {
 #ifndef TEST_ENV
     /* ======= For testing purposes only ======= */
@@ -42,7 +41,7 @@ void hc_handler_initialise(
     xTaskCreate(
         hc_receive_preset_data_handler_task, "Preset Data Receiver", configMINIMAL_STACK_SIZE, NULL,
         preset_data_receive_priority, NULL);
-    xTaskCreate(hc_toggle_handler_task, "Water Toggler", configMINIMAL_STACK_SIZE, NULL, toggle_priority, NULL);
+    // xTaskCreate(hc_toggle_handler_task, "Water Toggler", configMINIMAL_STACK_SIZE, NULL, toggle_priority, NULL);
     xTaskCreate(hc_handler_task, "Hardware Controller", configMINIMAL_STACK_SIZE, NULL, measurement_priority, NULL);
 }
 
@@ -71,8 +70,10 @@ void hc_receive_preset_data_handler_task(void *pvParameters)
     }
 }
 
-void hc_toggle_handler_task_run(void)
+/* void hc_toggle_handler_task_run(void)
 {
+    TickType_t       xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xFrequency    = pdMS_TO_TICKS();
     xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
     puts("Toggling water with event groups\n");
     if (water_controller_get_state())
@@ -91,7 +92,7 @@ void hc_toggle_handler_task(void *pvParameters)
     {
         hc_toggle_handler_task_run();
     }
-}
+} */
 
 static void _warn_if_measurement_outside_range(const char *name, uint16_t measurement, range_t range, status_leds_t led)
 {
@@ -147,7 +148,7 @@ void hc_handler_task_run(uint8_t counter)
 void hc_handler_task(void *pvParameters)
 {
     TickType_t       xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xFrequency    = pdMS_TO_TICKS(60000UL);
+    const TickType_t xFrequency    = pdMS_TO_TICKS(10000UL);
     uint8_t          counter       = 0;
 
     for (;;)
