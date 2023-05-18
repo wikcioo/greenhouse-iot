@@ -212,3 +212,42 @@ TEST_F(LorawanTest, downlink_handler_task_run_thc_presets)
 }
 
 // =========
+
+// *** UPLINK TESTS ***
+
+sensor_data_t example_uplinkPayload;
+
+size_t lorawan_uplink_xMessageBufferReceiveCustomFake(
+    MessageBufferHandle_t buffer, void *data, size_t size, TickType_t delay)
+{
+    sensor_data_t *uplinkPayload_ptr = (sensor_data_t *) data;
+
+    *uplinkPayload_ptr = example_uplinkPayload;
+
+    return 0;
+}
+
+TEST_F(LorawanTest, uplink_handler_task_run)
+{
+    example_uplinkPayload.is_water_valve_open = true;
+    example_uplinkPayload.temp                = 700U;
+    example_uplinkPayload.hum                 = 2555U;
+    example_uplinkPayload.co2                 = 1000U;
+
+    xMessageBufferReceive_fake.custom_fake = lorawan_uplink_xMessageBufferReceiveCustomFake;
+
+    uplink_handler_task_run();
+
+    ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, upLinkMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(sensor_data_t));
+    ASSERT_EQ(xMessageBufferReceive_fake.arg3_val, portMAX_DELAY);
+
+    ASSERT_EQ(lora_driver_mapReturnCodeToText_fake.call_count, 1);
+
+    ASSERT_EQ(lora_driver_sendUploadMessage_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_sendUploadMessage_fake.arg0_val, false);
+
+    ASSERT_EQ(status_leds_shortPuls_fake.call_count, 1);
+    ASSERT_EQ(status_leds_shortPuls_fake.arg0_val, led_ST4);
+}
