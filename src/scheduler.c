@@ -1,5 +1,6 @@
 #include "scheduler.h"
 
+#include <event_groups.h>
 #include <message_buffer.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,9 +8,13 @@
 
 #include "logger.h"
 #include "payload.h"
+#include "time_point.h"
 #include "water_controller.h"
 
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
+extern EventGroupHandle_t    xCreatedEventGroup;
+action_t                     manual_watering_action;
+time_point_t                 end_watering_time;
 
 interval_info_t interval_info = {.intervals = {0}, .current_size = 0};
 time_point_t    daily_time    = {0, 0};
@@ -19,7 +24,8 @@ void vTimerCallback(TimerHandle_t xTimer);
 static daily_time_interval_info_t _is_daily_time_in_interval_array();
 static void                       _debug_print_intervals();
 
-void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t scheduler_priority)
+void scheduler_handler_initialise(
+    UBaseType_t data_receive_priority, UBaseType_t scheduler_priority, UBaseType_t toggle_priority)
 {
 #ifndef TEST_ENV
     /* ======= For testing purposes only ======= */
@@ -45,6 +51,8 @@ void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t
     xTaskCreate(
         scheduler_schedule_events_handler_task, "Scheduler Event Scheduler", configMINIMAL_STACK_SIZE, NULL,
         scheduler_priority, NULL);
+    xTaskCreate(
+        scheduler_manual_toggling_handler_task, "Water Toggler", configMINIMAL_STACK_SIZE, NULL, toggle_priority, NULL);
 }
 
 void scheduler_receive_data_handler_task_run(void)
@@ -118,18 +126,25 @@ static time_point_t _get_next_interval_start_after_daily_time()
 void scheduler_schedule_events_handler_task_run(void)
 {
     daily_time_interval_info_t info = _is_daily_time_in_interval_array();
+    time_point_t               current_interval_end;
+    time_point_t               next_interval_start;
+    uint16_t                   minutes_to_sleep;
+    uint32_t                   ms_to_sleep;
     if (info.status)
     {
         if (!water_controller_get_state())
         {
-            water_controller_on();
-            LOG("Scheduler opened water valve\n");
-            LOG("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
+            interval_t current_interval     = interval_info.intervals[info.index];
+            manual_watering_action.water_on = true;
+            manual_watering_action.duration = time_get_diff_in_minutes(&current_interval.end, &current_interval.start);
+            xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+           
         }
 
-        time_point_t current_interval_end = interval_info.intervals[info.index].end;
-        uint16_t     minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &current_interval_end);
-        uint32_t     ms_to_sleep          = minutes_to_sleep * 60000;
+        current_interval_end = interval_info.intervals[info.index].end;
+        next_interval_start  = _get_next_interval_start_after_daily_time();
+        minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &next_interval_start);
+        ms_to_sleep          = minutes_to_sleep * 60000;
 
         if (current_interval_end.hour == 24 && current_interval_end.minute == 0)
         {
@@ -197,4 +212,46 @@ void vTimerCallback(TimerHandle_t xTimer)
     }
 
     LOG("Daily time incremented to {\n\tHour: %u\n\tMinute: %u\n}\n", daily_time.hour, daily_time.minute);
+}
+
+// Manuall toggling
+void scheduler_manual_toggling_handler_task_run(void)
+{
+ 
+    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
+    puts("Toggling water with event groups\n");
+
+    if (water_controller_get_state())
+    {
+        time_point_t time_to_extend = time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
+        if (time_is_before(&end_watering_time, &time_to_extend))
+        {
+            end_watering_time = time_to_extend;
+        }
+    }
+    else
+    {
+        water_controller_on();
+        vTaskDelay(pdMS_TO_TICKS(manual_watering_action.duration * 60000UL));
+        if (time_is_before(&end_watering_time, &daily_time) ||
+            time_get_diff_in_minutes(&daily_time, &end_watering_time) == 0)
+        {
+            puts("ziro deffernt");
+            water_controller_off();
+        }
+        else
+        {
+            puts("some time added to watering");
+            vTaskDelay(pdMS_TO_TICKS(manual_watering_action.duration * 60000UL));
+            water_controller_off();
+        }
+    }
+}
+
+void scheduler_manual_toggling_handler_task(void *pvParameters)
+{
+    for (;;)
+    {
+        scheduler_manual_toggling_handler_task_run();
+    }
 }
