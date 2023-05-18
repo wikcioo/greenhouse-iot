@@ -100,18 +100,18 @@ void payload_unpack_actions(const char *hex_str, action_t *actions)
 
     actions->water_on = (data[0] >> 1) & 1;
 
-    actions->interval = 0;
-    actions->interval |= (data[1] & 0x3) << 8;
-    actions->interval |= data[2] & 0xFF;
+    actions->duration = 0;
+    actions->duration |= (data[1] & 0x3) << 8;
+    actions->duration |= data[2] & 0xFF;
 }
 
 void payload_unpack_actions_u8_ptr(uint8_t *data, action_t *actions)
 {
     actions->water_on = (data[0] >> 1) & 1;
 
-    actions->interval = 0;
-    actions->interval |= (data[1] & 0x3) << 8;
-    actions->interval |= data[2] & 0xFF;
+    actions->duration = 0;
+    actions->duration |= (data[1] & 0x3) << 8;
+    actions->duration |= data[2] & 0xFF;
 }
 
 void payload_unpack_intervals(uint8_t *data, uint8_t length, interval_t *intervals)
