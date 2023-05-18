@@ -121,7 +121,7 @@ TEST_F(LorawanTest, downlink_handler_task_run_actions)
 {
     example_downlinkPayload.portNo   = 20U;
     example_downlinkPayload.len      = 1;
-    example_downlinkPayload.bytes[0] = {0x10};
+    example_downlinkPayload.bytes[0] = {0x14};
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
@@ -192,7 +192,7 @@ TEST_F(LorawanTest, downlink_handler_task_run_thc_presets)
 {
     example_downlinkPayload.portNo   = 20U;
     example_downlinkPayload.len      = 1;
-    example_downlinkPayload.bytes[0] = {0xC};
+    example_downlinkPayload.bytes[0] = {0x10};
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
