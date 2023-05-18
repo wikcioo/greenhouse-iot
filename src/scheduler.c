@@ -158,16 +158,10 @@ void scheduler_schedule_events_handler_task_run(void)
     }
     else
     {
-        if (water_controller_get_state())
-        {
-            water_controller_off();
-            LOG("Scheduler closed water valve\n");
-            LOG("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
-        }
+        interval_t current_interval_ = interval_info.intervals[info.index];
 
-        time_point_t next_interval_start = _get_next_interval_start_after_daily_time();
-        uint16_t     minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
-        uint32_t     ms_to_sleep         = minutes_to_sleep * 60000;
+        minutes_to_sleep = time_get_diff_in_minutes(&current_interval_.end, &next_interval_start);
+        ms_to_sleep      = minutes_to_sleep * 60000;
 
         if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
         {
@@ -217,7 +211,6 @@ void vTimerCallback(TimerHandle_t xTimer)
 // Manuall toggling
 void scheduler_manual_toggling_handler_task_run(void)
 {
- 
     xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
     puts("Toggling water with event groups\n");
 
