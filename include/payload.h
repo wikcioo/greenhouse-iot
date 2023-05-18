@@ -5,21 +5,23 @@
 
 #include "time_point.h"
 
-#define PAYLOAD_ID_TO_NAME(x)  \
-    (x == 1   ? "THC_READINGS" \
-     : x == 2 ? "INTERVALS"    \
-     : x == 3 ? "THC_PRESETS"  \
-     : x == 4 ? "ACTIONS"      \
-     : x == 5 ? "INVALID"      \
+#define PAYLOAD_ID_TO_NAME(x)          \
+    (x == 1   ? "THC_READINGS"         \
+     : x == 2 ? "INTERVALS_APPEND"     \
+     : x == 3 ? "INTERVALS_CLS_APPEND" \
+     : x == 4 ? "THC_PRESETS"          \
+     : x == 5 ? "ACTIONS"              \
+     : x == 6 ? "INVALID"              \
               : "UNKNOWN")
 
 typedef enum
 {
-    THC_READINGS = 1,
-    INTERVALS    = 2,
-    THC_PRESETS  = 3,
-    ACTIONS      = 4,
-    INVALID      = 5,
+    THC_READINGS         = 1,
+    INTERVALS_APPEND     = 2,
+    INTERVALS_CLS_APPEND = 3,
+    THC_PRESETS          = 4,
+    ACTIONS              = 5,
+    INVALID              = 6,
 } payload_id_t;
 
 typedef struct

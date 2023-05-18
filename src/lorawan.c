@@ -21,6 +21,7 @@ void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_p
     xTaskCreate(uplink_handler_task, "LRUpLink", configMINIMAL_STACK_SIZE + 200, NULL, uplink_priority, NULL);
     xTaskCreate(downlink_handler_task, "LRDownLink", configMINIMAL_STACK_SIZE + 200, NULL, downlink_priority, NULL);
 }
+
 void uplink_handler_task_run(void)
 {
     sensor_data_t data;
@@ -48,6 +49,7 @@ void uplink_handler_task_run(void)
         "Upload Message >%s<\n",
         lora_driver_mapReturnCodeToText(lora_driver_sendUploadMessage(false, &_uplink_payload)));
 }
+
 void uplink_handler_task(void *pvParameters)
 {
     lora_driver_resetRn2483(1);
@@ -63,6 +65,17 @@ void uplink_handler_task(void *pvParameters)
         uplink_handler_task_run();
     }
 }
+
+void send_intervals_to_scheduler(lora_driver_payload_t *downlinkPayload)
+{
+    interval_t intervals[7] = {0};
+    payload_unpack_intervals(downlinkPayload->bytes, downlinkPayload->len, intervals);
+    for (uint8_t i = 0; i < (downlinkPayload->len + 1) / 3; i++)
+    {
+        xMessageBufferSend(intervalDataMessageBufferHandle, &(intervals[i]), sizeof(interval_t), portMAX_DELAY);
+    }
+}
+
 void downlink_handler_task_run(void)
 {
     lora_driver_payload_t downlinkPayload;
@@ -78,14 +91,17 @@ void downlink_handler_task_run(void)
     {
         xEventGroupSetBits(xCreatedEventGroup, BIT_0);
     }
-    else if (payload_id == INTERVALS)
+    else if (payload_id == INTERVALS_CLS_APPEND)
     {
-        interval_t intervals[7] = {0};
-        payload_unpack_intervals(downlinkPayload.bytes, downlinkPayload.len, intervals);
-        for (uint8_t i = 0; i < (downlinkPayload.len + 1) / 3; i++)
-        {
-            xMessageBufferSend(intervalDataMessageBufferHandle, &(intervals[i]), sizeof(interval_t), portMAX_DELAY);
-        }
+        // Send an interval with all zeros to reset the interval array in scheduler
+        interval_t reset_interval = (interval_t){.start = {.hour = 0, .minute = 0}, .end = {.hour = 0, .minute = 0}};
+        xMessageBufferSend(intervalDataMessageBufferHandle, &reset_interval, sizeof(interval_t), portMAX_DELAY);
+
+        send_intervals_to_scheduler(&downlinkPayload);
+    }
+    else if (payload_id == INTERVALS_APPEND)
+    {
+        send_intervals_to_scheduler(&downlinkPayload);
     }
     else if (payload_id == THC_PRESETS)
     {
@@ -96,6 +112,7 @@ void downlink_handler_task_run(void)
         xMessageBufferSend(presetDataMessageBufferHandle, (void *) &data, sizeof(preset_data_t), portMAX_DELAY);
     }
 }
+
 void downlink_handler_task(void *pvParameters)
 {
     for (;;)
