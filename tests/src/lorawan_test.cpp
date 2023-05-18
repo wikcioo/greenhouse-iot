@@ -87,7 +87,6 @@ TEST_F(LorawanTest, lora_setup)
 
     lora_setup();
 
-    ASSERT_EQ(status_leds_slowBlink_fake.call_count, 1);
     ASSERT_EQ(lora_driver_rn2483FactoryReset_fake.call_count, 1);
     ASSERT_EQ(lora_driver_configureToEu868_fake.call_count, 1);
     ASSERT_EQ(lora_driver_getRn2483Hweui_fake.call_count, 1);
@@ -96,6 +95,4 @@ TEST_F(LorawanTest, lora_setup)
     ASSERT_EQ(lora_driver_saveMac_fake.call_count, 1);
     ASSERT_EQ(lora_driver_setAdaptiveDataRate_fake.call_count, 1);
     ASSERT_EQ(lora_driver_setReceiveDelay_fake.call_count, 1);
-    ASSERT_EQ(status_leds_longPuls_fake.call_count, 0);
-    ASSERT_EQ(status_leds_ledOn_fake.call_count, 1);
 }

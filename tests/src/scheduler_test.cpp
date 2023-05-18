@@ -28,9 +28,9 @@ class SchedulerTest : public ::testing::Test
 
 TEST_F(SchedulerTest, scheduler_handler_initialise)
 {
-    scheduler_handler_initialise(1, 3);
+    scheduler_handler_initialise(1, 3, 3);
 
-    ASSERT_EQ(xTaskCreate_fake.call_count, 2);
+    ASSERT_EQ(xTaskCreate_fake.call_count, 3);
 }
 
 interval_t example_interval;
@@ -96,7 +96,7 @@ TEST_F(SchedulerTest, schedule_events_handler_task_run_daily_time_outside_interv
 
     scheduler_schedule_events_handler_task_run();
 
-    ASSERT_EQ(xTaskDelayUntil_fake.call_count, 1);
-    // Sleep until midnight => 1085 minutes = 65100000 millis
+     ASSERT_EQ(xTaskDelayUntil_fake.call_count, 1);
+    //  Sleep until midnight => 1085 minutes = 65100000 millis
     ASSERT_EQ(xTaskDelayUntil_fake.arg1_val, 65100000);
 }

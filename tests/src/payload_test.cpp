@@ -21,7 +21,7 @@ TEST(payload, UnpackingActions)
     payload_unpack_actions(hex_str, &actions);
 
     EXPECT_EQ(actions.water_on, true);
-    EXPECT_EQ(actions.interval, 15);
+    EXPECT_EQ(actions.duration, 15);
 }
 
 TEST(payload, PackingLowerBounds)
