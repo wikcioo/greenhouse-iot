@@ -39,7 +39,7 @@ typedef struct
 typedef struct
 {
     bool     water_on;
-    uint16_t interval;
+    uint16_t duration;
 } action_t;
 
 typedef struct
