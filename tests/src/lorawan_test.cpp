@@ -4,6 +4,9 @@ extern "C"
 
 #include <lora_driver.h>
 #include <status_leds.h>
+
+#include "hardware_controller.h"
+#include "payload.h"
 }
 
 #include <gtest/gtest.h>
@@ -99,3 +102,113 @@ TEST_F(LorawanTest, lora_setup)
     ASSERT_EQ(status_leds_longPuls_fake.call_count, 0);
     ASSERT_EQ(status_leds_ledOn_fake.call_count, 1);
 }
+
+// *** DOWNLINK TESTS ***
+
+lora_driver_payload_t example_downlinkPayload;
+
+size_t lorawan_downlink_xMessageBufferReceiveCustomFake(MessageBufferHandle_t buffer, void *data, size_t size, TickType_t delay)
+{
+    lora_driver_payload_t *donwlinkPayload_ptr = (lora_driver_payload_t *) data;
+
+    *donwlinkPayload_ptr = example_downlinkPayload;
+
+    return 0;
+}
+
+TEST_F(LorawanTest, downlink_handler_task_run_actions)
+{
+    example_downlinkPayload.portNo   = 20U;
+    example_downlinkPayload.len      = 1;
+    example_downlinkPayload.bytes[0] = {0x10};
+
+    xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
+
+    downlink_handler_task_run();
+
+    // First xMessageBufferReceive
+    ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
+    ASSERT_EQ(xMessageBufferReceive_fake.arg3_val, portMAX_DELAY);
+
+    ASSERT_EQ(xEventGroupSetBits_fake.call_count, 1);
+    ASSERT_EQ(xEventGroupSetBits_fake.arg0_val, xCreatedEventGroup);
+    ASSERT_EQ(xEventGroupSetBits_fake.arg1_val, BIT_0);
+
+    ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
+}
+
+TEST_F(LorawanTest, downlink_handler_task_run_intervals1)
+{
+    example_downlinkPayload.portNo   = 20U;
+    example_downlinkPayload.len      = 2;
+    example_downlinkPayload.bytes[0] = {0xA};
+
+    xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
+
+    downlink_handler_task_run();
+
+    // First xMessageBufferReceive
+    ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
+    ASSERT_EQ(xMessageBufferReceive_fake.arg3_val, portMAX_DELAY);
+
+    ASSERT_EQ(xEventGroupSetBits_fake.call_count, 0);
+
+    ASSERT_EQ(xMessageBufferSend_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferSend_fake.arg0_val, intervalDataMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferSend_fake.arg2_val, sizeof(interval_t));
+    ASSERT_EQ(xMessageBufferSend_fake.arg3_val, portMAX_DELAY);
+}
+
+TEST_F(LorawanTest, downlink_handler_task_run_intervals2)
+{
+    example_downlinkPayload.portNo   = 20U;
+    example_downlinkPayload.len      = 5;
+    example_downlinkPayload.bytes[0] = {0xA};
+
+    xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
+
+    downlink_handler_task_run();
+
+    // First xMessageBufferReceive
+    ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
+    ASSERT_EQ(xMessageBufferReceive_fake.arg3_val, portMAX_DELAY);
+
+    ASSERT_EQ(xEventGroupSetBits_fake.call_count, 0);
+
+    ASSERT_EQ(xMessageBufferSend_fake.call_count, 2);
+    ASSERT_EQ(xMessageBufferSend_fake.arg0_val, intervalDataMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferSend_fake.arg2_val, sizeof(interval_t));
+    ASSERT_EQ(xMessageBufferSend_fake.arg3_val, portMAX_DELAY);
+}
+
+TEST_F(LorawanTest, downlink_handler_task_run_thc_presets)
+{
+    example_downlinkPayload.portNo   = 20U;
+    example_downlinkPayload.len      = 1;
+    example_downlinkPayload.bytes[0] = {0xC};
+
+    xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
+
+    downlink_handler_task_run();
+
+    // First xMessageBufferReceive
+    ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
+    ASSERT_EQ(xMessageBufferReceive_fake.arg3_val, portMAX_DELAY);
+
+    ASSERT_EQ(xEventGroupSetBits_fake.call_count, 0);
+
+    ASSERT_EQ(xMessageBufferSend_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferSend_fake.arg0_val, presetDataMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferSend_fake.arg2_val, sizeof(preset_data_t));
+    ASSERT_EQ(xMessageBufferSend_fake.arg3_val, portMAX_DELAY);
+}
+
+// =========
