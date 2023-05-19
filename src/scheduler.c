@@ -50,9 +50,7 @@ void scheduler_receive_data_handler_task_run(void)
 {
     interval_t data;
     xMessageBufferReceive(intervalDataMessageBufferHandle, &data, sizeof(interval_t), portMAX_DELAY);
-    printf(
-        "Received new interval {\n\tStart = %d:%d\n\tEnd = %d%d\n}\n", data.start.hour, data.start.minute,
-        data.end.hour, data.end.minute);
+    printf("Received interval {%d:%d | %d:%d}\n", data.start.hour, data.start.minute, data.end.hour, data.end.minute);
 
     if (data.start.hour == 0 && data.start.minute == 0 && data.end.hour == 0 && data.end.minute == 0)
     {
@@ -64,8 +62,6 @@ void scheduler_receive_data_handler_task_run(void)
     {
         interval_info.intervals[interval_info.current_size++] = data;
     }
-
-    _debug_print_intervals();
 }
 
 void scheduler_receive_data_handler_task(void *pvParameters)
