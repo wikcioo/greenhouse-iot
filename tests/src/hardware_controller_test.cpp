@@ -2,9 +2,6 @@ extern "C"
 {
 #include "hardware_controller.h"
 
-#include <status_leds.h>
-#include <stdlib.h>
-
 #include "water_controller.h"
 }
 
@@ -41,7 +38,6 @@ class HardwareControllerTest : public ::testing::Test
 TEST_F(HardwareControllerTest, hc_handler_initialise)
 {
     hc_handler_initialise(3, 3, 3);
-
 
     ASSERT_EQ(xTaskCreate_fake.call_count, 3);
 }
