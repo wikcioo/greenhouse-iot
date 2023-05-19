@@ -3,6 +3,7 @@
 #include <message_buffer.h>
 #include <status_leds.h>
 #include <stdio.h>
+#include <task.h>
 
 #include "co2.h"
 #include "humidity_temperature.h"
