@@ -3,6 +3,7 @@
 #include <message_buffer.h>
 #include <status_leds.h>
 #include <stdio.h>
+#include <task.h>
 
 #include "co2.h"
 #include "humidity_temperature.h"
@@ -12,9 +13,9 @@ extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
 extern EventGroupHandle_t    xCreatedEventGroup;
 
-static range_t temp_range;
-static range_t hum_range;
-static range_t co2_range;
+range_t temp_range;
+range_t hum_range;
+range_t co2_range;
 
 static void _print_preset_data()
 {
