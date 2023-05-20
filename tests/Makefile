@@ -11,9 +11,18 @@ TEST_SRC_DIR      := src
 FFF_DIR           := vendor
 BUILD_DIR         := build
 
-CFLAGS   := -c -DTEST_ENV -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR)
+CGCOV :=
+LGCOV :=
+
+ifeq ($(GEN_COV),true)
+	CGCOV    := -fprofile-arcs -ftest-coverage
+	LGCOV    := -lgcov
+endif
+
+CFLAGS   := -c -DTEST_ENV $(CGCOV) -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR)
 CXXFLAGS := -c -I$(DRIVERS_INC_DIR) -I$(USER_CODE_INC_DIR) -I$(MOCKS_DIR) -I$(FFF_DIR)
-LDFLAGS  := -lgtest -lpthread
+
+LDFLAGS  := $(LGCOV) -lgtest -lpthread
 
 # Add user source files you want to test to C_FILES variable
 C_FILES   := payload.c time_point.c co2.c humidity_temperature.c lorawan.c water_controller.c scheduler.c hardware_controller.c
