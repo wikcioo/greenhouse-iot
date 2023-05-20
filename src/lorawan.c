@@ -93,6 +93,7 @@ void downlink_handler_task_run(void)
     if (payload_id == ACTIONS)
     {
         payload_unpack_actions_u8_ptr(downlinkPayload.bytes, &manual_watering_action);
+        puts("Water toggling form operator");
         xEventGroupSetBits(xCreatedEventGroup, BIT_0);
     }
     else if (payload_id == INTERVALS_CLS_APPEND)
@@ -109,6 +110,8 @@ void downlink_handler_task_run(void)
     }
     else if (payload_id == THC_PRESETS)
     {
+        puts("Received THC_PRESETS");
+
         range_t temp_range, hum_range, co2_range;
         payload_unpack_thc_presets_u8_ptr(downlinkPayload.bytes, &temp_range, &hum_range, &co2_range);
 
