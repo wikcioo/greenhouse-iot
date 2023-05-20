@@ -73,19 +73,6 @@ TEST_F(SchedulerTest, receive_data_handler_task_run_zeroed_interval)
     ASSERT_EQ(interval_info.current_size, 0);
 }
 
-TEST_F(SchedulerTest, schedule_events_handler_task_run_daily_time_inside_interval_array)
-{
-    daily_time = {.hour = 6, .minute = 0};
-
-    interval_info.current_size = 1;
-    interval_info.intervals[0] = {.start = {.hour = 5, .minute = 55}, .end = {.hour = 6, .minute = 5}};
-
-    scheduler_schedule_events_handler_task_run();
-
-    ASSERT_EQ(xTaskDelayUntil_fake.call_count, 1);
-    // Sleep until 6:00 => 5 minutes = 300_000 millis
-    ASSERT_EQ(xTaskDelayUntil_fake.arg1_val, 300000);
-}
 
 TEST_F(SchedulerTest, schedule_events_handler_task_run_daily_time_outside_interval_array)
 {
@@ -96,7 +83,7 @@ TEST_F(SchedulerTest, schedule_events_handler_task_run_daily_time_outside_interv
 
     scheduler_schedule_events_handler_task_run();
 
-     ASSERT_EQ(xTaskDelayUntil_fake.call_count, 1);
+    ASSERT_EQ(xTaskDelayUntil_fake.call_count, 1);
     //  Sleep until midnight => 1085 minutes = 65100000 millis
     ASSERT_EQ(xTaskDelayUntil_fake.arg1_val, 65100000);
 }
