@@ -38,7 +38,7 @@ print_command_status
 
 echo -n "Generating coverage report in tests/coverage/... "
 mkdir -p "coverage"
-gcovr -r .. --html -o coverage/coverage_report.html
+gcovr -r .. --html -o coverage/index.html
 print_command_status
 
 clean_up
