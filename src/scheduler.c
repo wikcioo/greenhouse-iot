@@ -5,6 +5,7 @@
 #include <string.h>
 #include <timers.h>
 
+#include "logger.h"
 #include "payload.h"
 #include "water_controller.h"
 
@@ -50,7 +51,7 @@ void scheduler_receive_data_handler_task_run(void)
 {
     interval_t data;
     xMessageBufferReceive(intervalDataMessageBufferHandle, &data, sizeof(interval_t), portMAX_DELAY);
-    printf("Received interval {%d:%d | %d:%d}\n", data.start.hour, data.start.minute, data.end.hour, data.end.minute);
+    LOG("Received interval {%d:%d | %d:%d}\n", data.start.hour, data.start.minute, data.end.hour, data.end.minute);
 
     if (data.start.hour == 0 && data.start.minute == 0 && data.end.hour == 0 && data.end.minute == 0)
     {
@@ -85,17 +86,16 @@ static daily_time_interval_info_t _is_daily_time_in_interval_array()
 
 static void _debug_print_intervals()
 {
-    printf("Intervals {\n\tcurrent_size: %u\n", interval_info.current_size);
+    LOG("Intervals {\n\tcurrent_size: %u\n", interval_info.current_size);
 
     for (uint8_t i = 0; i < interval_info.current_size; i++)
     {
-        printf(
-            "\t[%u]: start = %u:%u | end = %u:%u\n", i, interval_info.intervals[i].start.hour,
+        LOG("\t[%u]: start = %u:%u | end = %u:%u\n", i, interval_info.intervals[i].start.hour,
             interval_info.intervals[i].start.minute, interval_info.intervals[i].end.hour,
             interval_info.intervals[i].end.minute);
     }
 
-    puts("}");
+    LOG("}\n");
 }
 
 static time_point_t _get_next_interval_start_after_daily_time()
@@ -123,8 +123,8 @@ void scheduler_schedule_events_handler_task_run(void)
         if (!water_controller_get_state())
         {
             water_controller_on();
-            printf("Scheduler opened water valve\n");
-            printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
+            LOG("Scheduler opened water valve\n");
+            LOG("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
         }
 
         time_point_t current_interval_end = interval_info.intervals[info.index].end;
@@ -133,10 +133,10 @@ void scheduler_schedule_events_handler_task_run(void)
 
         if (current_interval_end.hour == 24 && current_interval_end.minute == 0)
         {
-            puts("Sleeping until midnight");
+            LOG("Sleeping until midnight\n");
         }
 
-        printf("Inside sleep %u minutes\n", minutes_to_sleep);
+        LOG("Inside sleep %u minutes\n", minutes_to_sleep);
 
         TickType_t xLastWakeTime = xTaskGetTickCount();
         xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
@@ -146,8 +146,8 @@ void scheduler_schedule_events_handler_task_run(void)
         if (water_controller_get_state())
         {
             water_controller_off();
-            printf("Scheduler closed water valve\n");
-            printf("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
+            LOG("Scheduler closed water valve\n");
+            LOG("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
         }
 
         time_point_t next_interval_start = _get_next_interval_start_after_daily_time();
@@ -156,10 +156,10 @@ void scheduler_schedule_events_handler_task_run(void)
 
         if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
         {
-            puts("Sleeping until midnight");
+            LOG("Sleeping until midnight\n");
         }
 
-        printf("Outside sleep %u minutes\n", minutes_to_sleep);
+        LOG("Outside sleep %u minutes\n", minutes_to_sleep);
 
         TickType_t xLastWakeTime = xTaskGetTickCount();
         xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
@@ -196,5 +196,5 @@ void vTimerCallback(TimerHandle_t xTimer)
         daily_time.hour = 0;
     }
 
-    printf("Daily time incremented to {\n\tHour: %u\n\tMinute: %u\n}\n", daily_time.hour, daily_time.minute);
+    LOG("Daily time incremented to {\n\tHour: %u\n\tMinute: %u\n}\n", daily_time.hour, daily_time.minute);
 }

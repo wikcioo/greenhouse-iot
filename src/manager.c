@@ -10,6 +10,7 @@
 #include "hardware_controller.h"
 #include "humidity_temperature.h"
 #include "initialiser.h"
+#include "logger.h"
 #include "lorawan.h"
 #include "payload.h"
 #include "scheduler.h"
@@ -36,20 +37,20 @@ void initialiseSystem()
 
     if (hum_temp_init())
     {
-        puts("HIH8120 driver initialized successfully");
+        LOG("HIH8120 driver initialized successfully\n");
     }
     else
     {
-        puts("HIH8120 driver failed");
+        LOG("HIH8120 driver failed\n");
     }
 
     if (co2_init())
     {
-        puts("MH_Z19 driver initialized successfully");
+        LOG("MH_Z19 driver initialized successfully\n");
     }
     else
     {
-        puts("MH_Z19 driver failed");
+        LOG("MH_Z19 driver failed\n");
     }
 
     water_controller_init();
