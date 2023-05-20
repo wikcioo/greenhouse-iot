@@ -71,18 +71,17 @@ void downlink_handler_task_run(void)
 
     xMessageBufferReceive(downLinkMessageBufferHandle, &downlinkPayload, sizeof(lora_driver_payload_t), portMAX_DELAY);
 
-    // printf("DOWN LINK: from port: %d with %d bytes received!\n", downlinkPayload.portNo, downlinkPayload.len);
-
     payload_id_t payload_id = payload_get_id_u8_ptr(downlinkPayload.bytes);
-    // printf("Payload name = %s\n", PAYLOAD_ID_TO_NAME(payload_id));
 
     if (payload_id == ACTIONS)
     {
         payload_unpack_actions_u8_ptr(downlinkPayload.bytes, &manual_watering_action);
+        puts("Water toggling form operator");
         xEventGroupSetBits(xCreatedEventGroup, BIT_0);
     }
     else if (payload_id == INTERVALS)
     {
+        puts("Received intervals");
         interval_t intervals[7] = {0};
         payload_unpack_intervals(downlinkPayload.bytes, downlinkPayload.len, intervals);
         for (uint8_t i = 0; i < (downlinkPayload.len + 1) / 3; i++)
@@ -92,6 +91,8 @@ void downlink_handler_task_run(void)
     }
     else if (payload_id == THC_PRESETS)
     {
+        puts("Received THC_PRESETS");
+
         range_t temp_range, hum_range, co2_range;
         payload_unpack_thc_presets_u8_ptr(downlinkPayload.bytes, &temp_range, &hum_range, &co2_range);
 
