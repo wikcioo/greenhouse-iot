@@ -160,3 +160,32 @@ TEST(time_point, DiffUntilMidnight2)
 
     EXPECT_EQ(result, 1124);
 }
+TEST(time_point, time_get_sum_of_time_with_minutes)
+{
+    time_point_t t1      = {.hour = 5, .minute = 16};
+    uint8_t      minutes = 30;
+
+    time_point_t result = time_get_sum_of_time_with_minutes(t1, minutes);
+
+    EXPECT_EQ(result.minute, 46);
+    EXPECT_EQ(result.hour, 5);
+}
+TEST(time_point, time_get_sum_of_time_with_minutes2)
+{
+    time_point_t t1      = {.hour = 5, .minute = 16};
+    uint8_t      minutes = 44;
+
+    time_point_t result = time_get_sum_of_time_with_minutes(t1, minutes);
+
+    EXPECT_EQ(result.minute, 0);
+    EXPECT_EQ(result.hour, 6);
+}
+TEST(time_point, time_get_time_from_minutes)
+{
+    uint8_t minutes = 100;
+
+    time_point_t result = time_get_time_from_minutes(minutes);
+
+    EXPECT_EQ(result.minute, 40);
+    EXPECT_EQ(result.hour, 1);
+}
