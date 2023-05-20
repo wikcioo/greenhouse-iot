@@ -7,6 +7,7 @@
 
 #include "co2.h"
 #include "humidity_temperature.h"
+#include "logger.h"
 #include "water_controller.h"
 
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
@@ -19,8 +20,7 @@ range_t co2_range;
 
 static void _print_preset_data()
 {
-    printf(
-        "New preset data {\n\ttemperature: [%u, %u]\n\thumidity: [%u, %u]\n\tco2: [%u, %u]\n}\n", temp_range.low,
+    LOG("New preset data {\n\ttemperature: [%u, %u]\n\thumidity: [%u, %u]\n\tco2: [%u, %u]\n}\n", temp_range.low,
         temp_range.high, hum_range.low, hum_range.high, co2_range.low, co2_range.high);
 }
 
@@ -75,7 +75,7 @@ void hc_receive_preset_data_handler_task(void *pvParameters)
 void hc_toggle_handler_task_run(void)
 {
     xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
-    puts("Toggling water with event groups\n");
+    LOG("Toggling water with event groups\n");
     if (water_controller_get_state())
     {
         water_controller_off();
@@ -98,8 +98,7 @@ static void _warn_if_measurement_outside_range(const char *name, uint16_t measur
 {
     if (measurement < range.low || measurement > range.high)
     {
-        printf(
-            "[warning]: %s measurement (%u) is outside of range [%u, %u]\n", name, measurement, range.low, range.high);
+        LOG("[warning]: %s measurement (%u) is outside of range [%u, %u]\n", name, measurement, range.low, range.high);
 
         status_leds_fastBlink(led);
     }
@@ -131,7 +130,7 @@ void hc_handler_task_run(uint8_t counter)
     uint16_t hum  = get_last_humidity_measurement();
     uint16_t co2  = co2_get_latest_measurement();
 
-    printf("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
+    LOG("Measurement [%d] {\n\tTemperature: %u\n\tHumidity: %d\n\tCO2: %u\n}\n", counter, temp, hum, co2);
 
     _handle_measurements_outside_range(temp, hum, co2);
 
