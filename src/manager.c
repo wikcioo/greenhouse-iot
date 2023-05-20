@@ -54,8 +54,8 @@ void initialiseSystem()
 
     water_controller_init();
     hc_handler_initialise(3, 3);
-    scheduler_handler_initialise(4, 4, 3);
+    scheduler_handler_initialise(3, 4, configMAX_PRIORITIES);
 
     lora_driver_initialise(1, downLinkMessageBufferHandle);
-    lora_handler_initialise(3, 3);
+    lora_handler_initialise(2, 2);
 }
