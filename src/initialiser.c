@@ -1,3 +1,5 @@
+#include "initialiser.h"
+
 #include <avr/io.h>
 #include <lora_driver.h>
 #include <message_buffer.h>
@@ -9,7 +11,6 @@
 #include "co2.h"
 #include "hardware_controller.h"
 #include "humidity_temperature.h"
-#include "initialiser.h"
 #include "logger.h"
 #include "lorawan.h"
 #include "payload.h"
