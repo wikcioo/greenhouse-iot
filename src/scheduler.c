@@ -23,25 +23,28 @@ void vTimerCallback(TimerHandle_t xTimer);
 
 static daily_time_interval_info_t _is_daily_time_in_interval_array();
 static void                       _debug_print_intervals();
-
-void scheduler_handler_initialise(
-    UBaseType_t data_receive_priority, UBaseType_t scheduler_priority, UBaseType_t toggle_priority)
+void                              scheduler_handler_initialise(
+                                 UBaseType_t data_receive_priority, UBaseType_t scheduler_priority, UBaseType_t toggle_priority)
 {
 #ifndef TEST_ENV
     /* ======= For testing purposes only ======= */
     daily_time.hour   = 5;
     daily_time.minute = 10;
 
-    interval_t temp_interval = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 12}};
+    interval_t temp_interval_1 = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 13}};
+    interval_t temp_interval_2 = {.start = {.hour = 5, .minute = 12}, .end = {.hour = 5, .minute = 14}};
+    interval_t temp_interval_3 = {.start = {.hour = 5, .minute = 15}, .end = {.hour = 5, .minute = 16}};
 
-    interval_info.intervals[interval_info.current_size++] = temp_interval;
+    interval_info.intervals[interval_info.current_size++] = temp_interval_1;
+    interval_info.intervals[interval_info.current_size++] = temp_interval_2;
+    interval_info.intervals[interval_info.current_size++] = temp_interval_3;
 
-    temp_interval.start.hour   = 5;
-    temp_interval.start.minute = 14;
-    temp_interval.end.hour     = 24;
-    temp_interval.end.minute   = 0;
+    /*  temp_interval.start.hour   = 5;
+     temp_interval.start.minute = 14;
+     temp_interval.end.hour     = 24;
+     temp_interval.end.minute   = 0;
 
-    interval_info.intervals[interval_info.current_size++] = temp_interval;
+     interval_info.intervals[interval_info.current_size++] = temp_interval; */
     /* ========================================= */
 #endif
 
@@ -125,54 +128,21 @@ static time_point_t _get_next_interval_start_after_daily_time()
 
 void scheduler_schedule_events_handler_task_run(void)
 {
+    time_point_t next_interval_start = _get_next_interval_start_after_daily_time();
+    uint16_t     minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
+    uint32_t     ms_to_sleep         = minutes_to_sleep * 60000;
+    TickType_t   xLastWakeTime       = xTaskGetTickCount();
+
+    xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
+
     daily_time_interval_info_t info = _is_daily_time_in_interval_array();
-    time_point_t               current_interval_end;
-    time_point_t               next_interval_start;
-    uint16_t                   minutes_to_sleep;
-    uint32_t                   ms_to_sleep;
-    if (info.status)
-    {
-        if (!water_controller_get_state())
-        {
-            interval_t current_interval     = interval_info.intervals[info.index];
-            manual_watering_action.water_on = true;
-            manual_watering_action.duration = time_get_diff_in_minutes(&current_interval.end, &current_interval.start);
-            xEventGroupSetBits(xCreatedEventGroup, BIT_0);
-           
-        }
 
-        current_interval_end = interval_info.intervals[info.index].end;
-        next_interval_start  = _get_next_interval_start_after_daily_time();
-        minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &next_interval_start);
-        ms_to_sleep          = minutes_to_sleep * 60000;
+    interval_t current_interval     = interval_info.intervals[info.index];
+    manual_watering_action.water_on = true;
+    manual_watering_action.duration = time_get_diff_in_minutes(&current_interval.end, &current_interval.start);
 
-        if (current_interval_end.hour == 24 && current_interval_end.minute == 0)
-        {
-            LOG("Sleeping until midnight\n");
-        }
-
-        LOG("Inside sleep %u minutes\n", minutes_to_sleep);
-
-        TickType_t xLastWakeTime = xTaskGetTickCount();
-        xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
-    }
-    else
-    {
-        interval_t current_interval_ = interval_info.intervals[info.index];
-
-        minutes_to_sleep = time_get_diff_in_minutes(&current_interval_.end, &next_interval_start);
-        ms_to_sleep      = minutes_to_sleep * 60000;
-
-        if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
-        {
-            LOG("Sleeping until midnight\n");
-        }
-
-        LOG("Outside sleep %u minutes\n", minutes_to_sleep);
-
-        TickType_t xLastWakeTime = xTaskGetTickCount();
-        xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
-    }
+    LOG("Water toggling from scheduler.");
+    xEventGroupSetBits(xCreatedEventGroup, BIT_0);
 }
 
 void scheduler_schedule_events_handler_task(void *pvParameters)
@@ -213,33 +183,59 @@ void scheduler_manual_toggling_handler_task_run(void)
 {
     xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
     puts("Toggling water with event groups\n");
-
     if (water_controller_get_state())
     {
+        puts("water on");
         time_point_t time_to_extend = time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
+        manual_watering_action.duration = 0;
+
         if (time_is_before(&end_watering_time, &time_to_extend))
         {
-            end_watering_time = time_to_extend;
+            end_watering_time       = time_to_extend;
+            uint16_t remain_minutes = time_get_diff_in_minutes(&daily_time, &end_watering_time);
+            vTaskDelay(pdMS_TO_TICKS(remain_minutes * 60000UL));
+        }
+
+        if (time_is_before(&end_watering_time, &daily_time) ||
+            time_get_diff_in_minutes(&end_watering_time, &daily_time) == 0)
+        {
+            water_controller_off();
         }
     }
     else
     {
         water_controller_on();
-        vTaskDelay(pdMS_TO_TICKS(manual_watering_action.duration * 60000UL));
+        end_watering_time       = time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
+        uint16_t remain_minutes = time_get_diff_in_minutes(&daily_time, &end_watering_time);
+        vTaskDelay(pdMS_TO_TICKS(remain_minutes * 60000UL));
+        // xEventGroupSetBits(xCreatedEventGroup, BIT_0);
         if (time_is_before(&end_watering_time, &daily_time) ||
-            time_get_diff_in_minutes(&daily_time, &end_watering_time) == 0)
+            time_get_diff_in_minutes(&end_watering_time, &daily_time) == 0)
         {
-            puts("ziro deffernt");
-            water_controller_off();
-        }
-        else
-        {
-            puts("some time added to watering");
-            vTaskDelay(pdMS_TO_TICKS(manual_watering_action.duration * 60000UL));
             water_controller_off();
         }
     }
+    /*
+    //Secound way
+    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
+        water_controller_on();
+        time_point_t new_end_watering_time =
+            time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
+        if (!time_is_before(&end_watering_time, &new_end_watering_time))
+        {
+            continue;
+        }
+        end_watering_time = new_end_watering_time;
+        do
+        {
+            vTaskDelay(pdMS_TO_TICKS((time_get_diff_in_minutes(&daily_time, &end_watering_time) * 60000UL)) + 2);
+
+        } while (time_is_before(&end_watering_time, &daily_time));
+
+        water_controller_off();
+    */
 }
+
 
 void scheduler_manual_toggling_handler_task(void *pvParameters)
 {
