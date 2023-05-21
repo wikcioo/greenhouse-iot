@@ -19,6 +19,9 @@ extern MessageBufferHandle_t intervalDataMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
 extern EventGroupHandle_t    xCreatedEventGroup;
 extern action_t              manual_watering_action;
+extern time_point_t          daily_time;
+extern time_point_t          end_watering_time;
+
 
 void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_priority)
 {
@@ -93,8 +96,16 @@ void downlink_handler_task_run(void)
     if (payload_id == ACTIONS)
     {
         payload_unpack_actions_u8_ptr(downlinkPayload.bytes, &manual_watering_action);
-        puts("Water toggling form operator");
-        xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+        time_point_t new_end_watering_time =
+            time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
+
+        if (time_is_before(&end_watering_time, &new_end_watering_time))
+        {
+            end_watering_time = new_end_watering_time;
+            puts("Water toggling from scheduler.");
+            xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+        }
+        puts("Water toggling is skiped");
     }
     else if (payload_id == INTERVALS_CLS_APPEND)
     {
