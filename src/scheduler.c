@@ -33,7 +33,7 @@ void                              scheduler_handler_initialise(
 
     interval_t temp_interval_1 = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 13}};
     interval_t temp_interval_2 = {.start = {.hour = 5, .minute = 12}, .end = {.hour = 5, .minute = 14}};
-    interval_t temp_interval_3 = {.start = {.hour = 5, .minute = 15}, .end = {.hour = 5, .minute = 16}};
+    interval_t temp_interval_3 = {.start = {.hour = 5, .minute = 16}, .end = {.hour = 5, .minute = 17}};
 
     interval_info.intervals[interval_info.current_size++] = temp_interval_1;
     interval_info.intervals[interval_info.current_size++] = temp_interval_2;
@@ -132,17 +132,20 @@ void scheduler_schedule_events_handler_task_run(void)
     uint16_t     minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
     uint32_t     ms_to_sleep         = minutes_to_sleep * 60000;
     TickType_t   xLastWakeTime       = xTaskGetTickCount();
-
     xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(ms_to_sleep));
 
-    daily_time_interval_info_t info = _is_daily_time_in_interval_array();
-
-    interval_t current_interval     = interval_info.intervals[info.index];
-    manual_watering_action.water_on = true;
-    manual_watering_action.duration = time_get_diff_in_minutes(&current_interval.end, &current_interval.start);
-
-    LOG("Water toggling from scheduler.");
-    xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+    daily_time_interval_info_t info             = _is_daily_time_in_interval_array();
+    interval_t                 current_interval = interval_info.intervals[info.index];
+    manual_watering_action.water_on             = true;
+    manual_watering_action.duration    = time_get_diff_in_minutes(&current_interval.end, &current_interval.start);
+    time_point_t new_end_watering_time = time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
+    if (time_is_before(&end_watering_time, &new_end_watering_time))
+    {
+        end_watering_time = new_end_watering_time;
+        puts("Water toggling from scheduler.");
+        xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+    }
+    puts("Water toggling is skiped");
 }
 
 void scheduler_schedule_events_handler_task(void *pvParameters)
@@ -179,68 +182,26 @@ void vTimerCallback(TimerHandle_t xTimer)
 }
 
 // Manuall toggling
-void scheduler_manual_toggling_handler_task_run(void)
-{
-    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
-    puts("Toggling water with event groups\n");
-    if (water_controller_get_state())
-    {
-        puts("water on");
-        time_point_t time_to_extend = time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
-        manual_watering_action.duration = 0;
-
-        if (time_is_before(&end_watering_time, &time_to_extend))
-        {
-            end_watering_time       = time_to_extend;
-            uint16_t remain_minutes = time_get_diff_in_minutes(&daily_time, &end_watering_time);
-            vTaskDelay(pdMS_TO_TICKS(remain_minutes * 60000UL));
-        }
-
-        if (time_is_before(&end_watering_time, &daily_time) ||
-            time_get_diff_in_minutes(&end_watering_time, &daily_time) == 0)
-        {
-            water_controller_off();
-        }
-    }
-    else
-    {
-        water_controller_on();
-        end_watering_time       = time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
-        uint16_t remain_minutes = time_get_diff_in_minutes(&daily_time, &end_watering_time);
-        vTaskDelay(pdMS_TO_TICKS(remain_minutes * 60000UL));
-        // xEventGroupSetBits(xCreatedEventGroup, BIT_0);
-        if (time_is_before(&end_watering_time, &daily_time) ||
-            time_get_diff_in_minutes(&end_watering_time, &daily_time) == 0)
-        {
-            water_controller_off();
-        }
-    }
-    /*
-    //Secound way
-    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
-        water_controller_on();
-        time_point_t new_end_watering_time =
-            time_get_sum_of_time_with_minutes(daily_time, manual_watering_action.duration);
-        if (!time_is_before(&end_watering_time, &new_end_watering_time))
-        {
-            continue;
-        }
-        end_watering_time = new_end_watering_time;
-        do
-        {
-            vTaskDelay(pdMS_TO_TICKS((time_get_diff_in_minutes(&daily_time, &end_watering_time) * 60000UL)) + 2);
-
-        } while (time_is_before(&end_watering_time, &daily_time));
-
-        water_controller_off();
-    */
-}
-
 
 void scheduler_manual_toggling_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        scheduler_manual_toggling_handler_task_run();
+        // scheduler_manual_toggling_handler_task_run();
+        xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
+        water_controller_on();
+        puts("Toggling water with event groups\n");
+        if (time_is_before(&end_watering_time, &daily_time) ||
+            time_get_diff_in_minutes(&end_watering_time, &daily_time) == 0)
+        {
+            water_controller_off();
+            continue;
+        }
+        else
+        {
+            uint16_t remain_minutes = time_get_diff_in_minutes(&daily_time, &end_watering_time);
+            vTaskDelay(pdMS_TO_TICKS(remain_minutes * 60000UL));
+            water_controller_off();
+        }
     }
 }
