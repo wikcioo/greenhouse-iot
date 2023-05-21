@@ -3,3 +3,4 @@ build/
 compile_commands.json
 include/env.h
 .vscode/settings.json
+coverage/

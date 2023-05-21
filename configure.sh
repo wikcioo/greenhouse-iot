@@ -6,10 +6,10 @@
 #   Create env.h header file containing LoRaWAN keys
 #   Install required binaries:
 #   Cli Mode:
-#       gcc-avr avr-libc make libgtest-dev
+#       gcc-avr avr-libc gcovr make libgtest-dev
 #
 #   User Mode:
-#       gcc-avr avr-libc make libgtest-dev
+#       gcc-avr avr-libc gcovr make libgtest-dev
 #       gdb-avr avrdude avarice bear minicom clang-format
 
 cli_mode=false
@@ -46,7 +46,7 @@ if [[ "$cli_mode" = true ]]; then
 fi
 
 # List of base packages to check for
-packages=("gcc-avr" "avr-libc" "make" "libgtest-dev")
+packages=("gcc-avr" "avr-libc" "gcovr" "make" "libgtest-dev")
 
 if [ "$cli_mode" = false ]; then
     # Add more packages in user mode

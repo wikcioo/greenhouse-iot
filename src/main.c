@@ -1,11 +1,12 @@
 #include <stdio.h>
 
-#include "manager.h"
+#include "initialiser.h"
+#include "logger.h"
 
 int main(void)
 {
-    initialiseManager();
-    printf("Program Started!!\n");
+    initialiseSystem();
+    LOG("Program Started!!\n");
 
     vTaskStartScheduler();
 
