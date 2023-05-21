@@ -37,7 +37,7 @@ TEST_F(HardwareControllerTest, hc_handler_initialise)
 {
     hc_handler_initialise(3, 3);
 
-    ASSERT_EQ(xTaskCreate_fake.call_count, 3);
+    ASSERT_EQ(xTaskCreate_fake.call_count, 2);
 }
 
 preset_data_t example_presets;

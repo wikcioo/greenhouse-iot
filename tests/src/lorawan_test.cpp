@@ -7,6 +7,7 @@ extern "C"
 
 #include "hardware_controller.h"
 #include "payload.h"
+#include "scheduler.h"
 }
 
 #include <gtest/gtest.h>
@@ -119,8 +120,10 @@ size_t lorawan_downlink_xMessageBufferReceiveCustomFake(
 TEST_F(LorawanTest, downlink_handler_task_run_actions)
 {
     example_downlinkPayload.portNo   = 20U;
-    example_downlinkPayload.len      = 1;
-    example_downlinkPayload.bytes[0] = {0x14};
+    example_downlinkPayload.len      = 3;
+    example_downlinkPayload.bytes[0] = {0x15};
+    example_downlinkPayload.bytes[1] = {0x00};
+    example_downlinkPayload.bytes[2] = {0x01};
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
