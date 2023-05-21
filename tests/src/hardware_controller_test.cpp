@@ -13,7 +13,6 @@ extern range_t temp_range;
 extern range_t hum_range;
 extern range_t co2_range;
 
-extern EventGroupHandle_t    xCreatedEventGroup;
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
 
 class HardwareControllerTest : public ::testing::Test
@@ -25,7 +24,6 @@ class HardwareControllerTest : public ::testing::Test
         RESET_FAKE(xTaskCreate);
         RESET_FAKE(xMessageBufferReceive);
         RESET_FAKE(xMessageBufferSend);
-        RESET_FAKE(xEventGroupWaitBits);
         RESET_FAKE(xTaskDelayUntil);
         RESET_FAKE(vTaskDelay);
         RESET_FAKE(xTaskGetTickCount);
@@ -37,7 +35,7 @@ class HardwareControllerTest : public ::testing::Test
 
 TEST_F(HardwareControllerTest, hc_handler_initialise)
 {
-    hc_handler_initialise(3, 3, 3);
+    hc_handler_initialise(3, 3);
 
     ASSERT_EQ(xTaskCreate_fake.call_count, 3);
 }
@@ -90,18 +88,6 @@ TEST_F(HardwareControllerTest, hc_receive_preset_data_handler_task_run)
     free(temp_range_data);
     free(hum_range_data);
     free(co2_range_data);
-}
-
-TEST_F(HardwareControllerTest, hc_toggle_handler_task_run)
-{
-    hc_toggle_handler_task_run();
-
-    ASSERT_EQ(xEventGroupWaitBits_fake.call_count, 1);
-    ASSERT_EQ(xEventGroupWaitBits_fake.arg0_val, xCreatedEventGroup);
-    ASSERT_EQ(xEventGroupWaitBits_fake.arg1_val, BIT_0);
-    ASSERT_EQ(xEventGroupWaitBits_fake.arg2_val, pdTRUE);
-    ASSERT_EQ(xEventGroupWaitBits_fake.arg3_val, pdFALSE);
-    ASSERT_EQ(xEventGroupWaitBits_fake.arg4_val, portMAX_DELAY);
 }
 
 TEST_F(HardwareControllerTest, hc_handler_task_run1)
