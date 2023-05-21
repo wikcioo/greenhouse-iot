@@ -13,6 +13,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Make configure.sh executable
+        run: chmod +x configure.sh
+      - name: Configure
+        run: ./configure.sh -c
       - name: Make coverage.sh executable
         run: chmod +x coverage.sh
       - name: Generate test coverage report
