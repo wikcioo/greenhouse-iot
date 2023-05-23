@@ -23,6 +23,10 @@ MessageBufferHandle_t downLinkMessageBufferHandle;
 MessageBufferHandle_t presetDataMessageBufferHandle;
 EventGroupHandle_t    xCreatedEventGroup;
 
+#ifdef ENABLE_DEBUG_PRINT
+SemaphoreHandle_t loggerMutex;
+#endif
+
 void initialiseSystem()
 {
     DDRA |= _BV(DDA0) | _BV(DDA7);
@@ -35,6 +39,9 @@ void initialiseSystem()
     upLinkMessageBufferHandle       = xMessageBufferCreate(sizeof(sensor_data_t) * 2);
     presetDataMessageBufferHandle   = xMessageBufferCreate(sizeof(preset_data_t) * 2);
     xCreatedEventGroup              = xEventGroupCreate();
+#ifdef ENABLE_DEBUG_PRINT
+    loggerMutex = xSemaphoreCreateMutex();
+#endif
 
     if (hum_temp_init())
     {
