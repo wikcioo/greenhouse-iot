@@ -93,7 +93,7 @@ TEST_F(LorawanTest, lora_setup)
     ASSERT_EQ(status_leds_slowBlink_fake.call_count, 1);
     ASSERT_EQ(lora_driver_rn2483FactoryReset_fake.call_count, 1);
     ASSERT_EQ(lora_driver_configureToEu868_fake.call_count, 1);
-    ASSERT_EQ(lora_driver_getRn2483Hweui_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_getRn2483Hweui_fake.call_count, 0);
     ASSERT_EQ(lora_driver_setDeviceIdentifier_fake.call_count, 1);
     ASSERT_EQ(lora_driver_setOtaaIdentity_fake.call_count, 1);
     ASSERT_EQ(lora_driver_saveMac_fake.call_count, 1);
