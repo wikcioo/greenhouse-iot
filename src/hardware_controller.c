@@ -96,6 +96,9 @@ void hc_toggle_handler_task(void *pvParameters)
 
 static void _warn_if_measurement_outside_range(const char *name, uint16_t measurement, range_t range, status_leds_t led)
 {
+    if (range.low == 0 && range.high == 0)
+        return;
+
     if (measurement < range.low || measurement > range.high)
     {
         LOG("[warning]: %s measurement (%u) is outside of range [%u, %u]\n", name, measurement, range.low, range.high);
