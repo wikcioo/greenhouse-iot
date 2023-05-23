@@ -123,44 +123,31 @@ void downlink_handler_task(void *pvParameters)
 
 void lora_setup(void)
 {
-    char *result;
-    char  _out_buf[20];
+    char _out_buf[20];
 
     lora_driver_returnCode_t rc;
     status_leds_slowBlink(led_ST2);  // OPTIONAL: Led the green led blink slowly while we are setting up LoRa
 
     // Factory reset the transceiver
-    result = lora_driver_mapReturnCodeToText(lora_driver_rn2483FactoryReset());
-    LOG("FactoryReset >%s<\n", result);
+    lora_driver_rn2483FactoryReset();
 
     // Configure to EU868 LoRaWAN standards
-    result = lora_driver_mapReturnCodeToText(lora_driver_configureToEu868());
-    LOG("Configure to EU868 >%s<\n", result);
-
-    // Get the transceivers HW EUI
-    rc     = lora_driver_getRn2483Hweui(_out_buf);
-    result = lora_driver_mapReturnCodeToText(rc);
-    LOG("Get HWEUI >%s<: %s\n", result, _out_buf);
+    lora_driver_configureToEu868();
 
     // Set the HWEUI as DevEUI in the LoRaWAN software stack in the transceiver
-    result = lora_driver_mapReturnCodeToText(lora_driver_setDeviceIdentifier(_out_buf));
-    LOG("Set DevEUI: %s >%s<\n", _out_buf, result);
+    lora_driver_setDeviceIdentifier(_out_buf);
 
     // Set Over The Air Activation parameters to be ready to join the LoRaWAN
-    result = lora_driver_mapReturnCodeToText(lora_driver_setOtaaIdentity(LORA_appEUI, LORA_appKEY, _out_buf));
-    LOG("Set OTAA Identity appEUI:%s appKEY:%s devEUI:%s >%s<\n", LORA_appEUI, LORA_appKEY, _out_buf, result);
+    lora_driver_setOtaaIdentity(LORA_appEUI, LORA_appKEY, _out_buf);
 
     // Save all the MAC settings in the transceiver
-    result = lora_driver_mapReturnCodeToText(lora_driver_saveMac());
-    LOG("Save mac >%s<\n", result);
+    lora_driver_saveMac();
 
     // Enable Adaptive Data Rate
-    result = lora_driver_mapReturnCodeToText(lora_driver_setAdaptiveDataRate(LORA_ON));
-    LOG("Set Adaptive Data Rate: ON >%s<\n", result);
+    lora_driver_setAdaptiveDataRate(LORA_ON);
 
     // Set receiver window1 delay to 500 ms - this is needed if down-link messages will be used
-    result = lora_driver_mapReturnCodeToText(lora_driver_setReceiveDelay(500));
-    LOG("Set Receiver Delay: %d ms >%s<\n", 500, result);
+    lora_driver_setReceiveDelay(500);
 
     // Join the LoRaWAN
     uint8_t maxJoinTriesLeft = 10;
