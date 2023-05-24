@@ -128,7 +128,7 @@ TEST_F(HardwareControllerTest, hc_toggle_handler_task_run_water_on_keep_end_wate
     end_watering_time.hour   = 5;
     end_watering_time.minute = 30;
 
-    example_action = (action_t){.water_on = true, .interval = 10};
+    example_action = (action_t){.water_on = true, .duration = 10};
 
     xMessageBufferReceive_fake.custom_fake = hc_xMessageBufferReceiveActionCustomFake;
 
@@ -150,7 +150,7 @@ TEST_F(HardwareControllerTest, hc_toggle_handler_task_run_water_on_increment_end
     end_watering_time.hour   = 5;
     end_watering_time.minute = 30;
 
-    example_action = (action_t){.water_on = true, .interval = 30};
+    example_action = (action_t){.water_on = true, .duration = 30};
 
     xMessageBufferReceive_fake.custom_fake = hc_xMessageBufferReceiveActionCustomFake;
 

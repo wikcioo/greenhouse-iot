@@ -22,7 +22,7 @@ TEST(payload, UnpackingActions)
     EXPECT_EQ(payload_get_id(hex_str), ACTIONS);
 
     EXPECT_EQ(actions.water_on, true);
-    EXPECT_EQ(actions.interval, 15);
+    EXPECT_EQ(actions.duration, 15);
 }
 
 TEST(payload, PackingLowerBounds)

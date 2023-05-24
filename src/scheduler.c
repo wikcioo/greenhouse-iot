@@ -119,7 +119,7 @@ void scheduler_schedule_events_handler_task_run(void)
         uint16_t     minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &current_interval_end);
         uint32_t     ms_to_sleep          = minutes_to_sleep * 60000;
 
-        action_t action = {.water_on = true, .interval = minutes_to_sleep};
+        action_t action = {.water_on = true, .duration = minutes_to_sleep};
         xMessageBufferSend(actionDataMessageBufferHandle, &action, sizeof(action_t), portMAX_DELAY);
 
         if (current_interval_end.hour == 24 && current_interval_end.minute == 0)

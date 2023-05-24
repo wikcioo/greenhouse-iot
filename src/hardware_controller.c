@@ -81,11 +81,11 @@ void hc_toggle_handler_task_run(void)
     xMessageBufferReceive(actionDataMessageBufferHandle, &received_action, sizeof(action_t), portMAX_DELAY);
 
     LOG("Received action {\n\twater_on: %s\n\tduration: %u\n}\n", received_action.water_on ? "true" : "false",
-        received_action.interval);
+        received_action.duration);
 
     if (received_action.water_on)
     {
-        time_point_t new_end_time = time_add_minutes(daily_time, received_action.interval);
+        time_point_t new_end_time = time_add_minutes(daily_time, received_action.duration);
         if (!time_is_before(&new_end_time, &end_watering_time))
         {
             end_watering_time = new_end_time;
