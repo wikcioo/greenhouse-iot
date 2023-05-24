@@ -12,11 +12,14 @@
 
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
-extern EventGroupHandle_t    xCreatedEventGroup;
+extern MessageBufferHandle_t actionDataMessageBufferHandle;
 
 range_t temp_range;
 range_t hum_range;
 range_t co2_range;
+
+extern time_point_t daily_time;
+time_point_t        end_watering_time;
 
 static void _print_preset_data()
 {
@@ -74,15 +77,31 @@ void hc_receive_preset_data_handler_task(void *pvParameters)
 
 void hc_toggle_handler_task_run(void)
 {
-    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
-    LOG("Toggling water with event groups\n");
-    if (water_controller_get_state())
+    action_t received_action;
+    xMessageBufferReceive(actionDataMessageBufferHandle, &received_action, sizeof(action_t), portMAX_DELAY);
+
+    LOG("Received action {\n\twater_on: %s\n\tduration: %u\n}\n", received_action.water_on ? "true" : "false",
+        received_action.interval);
+
+    if (received_action.water_on)
     {
-        water_controller_off();
+        time_point_t new_end_time = time_add_minutes(daily_time, received_action.interval);
+        if (!time_is_before(&new_end_time, &end_watering_time))
+        {
+            end_watering_time = new_end_time;
+        }
+
+        if (time_is_before(&daily_time, &end_watering_time))
+        {
+            water_controller_on();
+        }
     }
     else
     {
-        water_controller_on();
+        if (!time_is_before(&daily_time, &end_watering_time))
+        {
+            water_controller_off();
+        }
     }
 }
 

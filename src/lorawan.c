@@ -15,7 +15,7 @@ extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t downLinkMessageBufferHandle;
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
-extern EventGroupHandle_t    xCreatedEventGroup;
+extern MessageBufferHandle_t actionDataMessageBufferHandle;
 
 void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_priority)
 {
@@ -89,7 +89,10 @@ void downlink_handler_task_run(void)
 
     if (payload_id == ACTIONS)
     {
-        xEventGroupSetBits(xCreatedEventGroup, BIT_0);
+        action_t action;
+        payload_unpack_actions_u8_ptr(downlinkPayload.bytes, &action);
+
+        xMessageBufferSend(actionDataMessageBufferHandle, &action, sizeof(action_t), portMAX_DELAY);
     }
     else if (payload_id == INTERVALS_CLS_APPEND)
     {
