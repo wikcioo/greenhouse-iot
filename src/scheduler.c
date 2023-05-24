@@ -10,9 +10,11 @@
 #include "water_controller.h"
 
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
+extern MessageBufferHandle_t actionDataMessageBufferHandle;
 
-interval_info_t interval_info = {.intervals = {0}, .current_size = 0};
-time_point_t    daily_time    = {0, 0};
+interval_info_t     interval_info = {.intervals = {0}, .current_size = 0};
+time_point_t        daily_time    = {0, 0};
+extern time_point_t end_watering_time;
 
 void vTimerCallback(TimerHandle_t xTimer);
 
@@ -26,14 +28,7 @@ void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t
     daily_time.hour   = 5;
     daily_time.minute = 10;
 
-    interval_t temp_interval = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 12}};
-
-    interval_info.intervals[interval_info.current_size++] = temp_interval;
-
-    temp_interval.start.hour   = 5;
-    temp_interval.start.minute = 14;
-    temp_interval.end.hour     = 24;
-    temp_interval.end.minute   = 0;
+    interval_t temp_interval = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 16}};
 
     interval_info.intervals[interval_info.current_size++] = temp_interval;
     /* ========================================= */
@@ -120,16 +115,12 @@ void scheduler_schedule_events_handler_task_run(void)
     daily_time_interval_info_t info = _is_daily_time_in_interval_array();
     if (info.status)
     {
-        if (!water_controller_get_state())
-        {
-            water_controller_on();
-            LOG("Scheduler opened water valve\n");
-            LOG("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
-        }
-
         time_point_t current_interval_end = interval_info.intervals[info.index].end;
         uint16_t     minutes_to_sleep     = time_get_diff_in_minutes(&daily_time, &current_interval_end);
         uint32_t     ms_to_sleep          = minutes_to_sleep * 60000;
+
+        action_t action = {.water_on = true, .duration = minutes_to_sleep};
+        xMessageBufferSend(actionDataMessageBufferHandle, &action, sizeof(action_t), portMAX_DELAY);
 
         if (current_interval_end.hour == 24 && current_interval_end.minute == 0)
         {
@@ -143,16 +134,12 @@ void scheduler_schedule_events_handler_task_run(void)
     }
     else
     {
-        if (water_controller_get_state())
-        {
-            water_controller_off();
-            LOG("Scheduler closed water valve\n");
-            LOG("Valve state: %s\n", water_controller_get_state() ? "on" : "off");
-        }
-
         time_point_t next_interval_start = _get_next_interval_start_after_daily_time();
         uint16_t     minutes_to_sleep    = time_get_diff_in_minutes(&daily_time, &next_interval_start);
         uint32_t     ms_to_sleep         = minutes_to_sleep * 60000;
+
+        action_t action = {.water_on = false};
+        xMessageBufferSend(actionDataMessageBufferHandle, &action, sizeof(action_t), portMAX_DELAY);
 
         if (next_interval_start.hour == 24 && next_interval_start.minute == 0)
         {
@@ -197,4 +184,10 @@ void vTimerCallback(TimerHandle_t xTimer)
     }
 
     LOG("Daily time incremented to {\n\tHour: %u\n\tMinute: %u\n}\n", daily_time.hour, daily_time.minute);
+
+    if (time_equals(&daily_time, &end_watering_time))
+    {
+        action_t action = {.water_on = false};
+        xMessageBufferSend(actionDataMessageBufferHandle, &action, sizeof(action_t), portMAX_DELAY);
+    }
 }

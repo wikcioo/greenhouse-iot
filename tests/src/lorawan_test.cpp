@@ -18,7 +18,7 @@ MessageBufferHandle_t upLinkMessageBufferHandle;
 MessageBufferHandle_t downLinkMessageBufferHandle;
 MessageBufferHandle_t intervalDataMessageBufferHandle;
 MessageBufferHandle_t presetDataMessageBufferHandle;
-EventGroupHandle_t    xCreatedEventGroup;
+MessageBufferHandle_t actionDataMessageBufferHandle;
 
 FAKE_VOID_FUNC(lora_driver_resetRn2483, uint8_t);
 FAKE_VOID_FUNC(lora_driver_flushBuffers);
@@ -127,17 +127,15 @@ TEST_F(LorawanTest, downlink_handler_task_run_actions)
 
     downlink_handler_task_run();
 
-    // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
     ASSERT_EQ(xMessageBufferReceive_fake.arg3_val, portMAX_DELAY);
 
-    ASSERT_EQ(xEventGroupSetBits_fake.call_count, 1);
-    ASSERT_EQ(xEventGroupSetBits_fake.arg0_val, xCreatedEventGroup);
-    ASSERT_EQ(xEventGroupSetBits_fake.arg1_val, BIT_0);
-
-    ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
+    ASSERT_EQ(xMessageBufferSend_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferSend_fake.arg0_val, actionDataMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferSend_fake.arg2_val, sizeof(action_t));
+    ASSERT_EQ(xMessageBufferSend_fake.arg3_val, portMAX_DELAY);
 }
 
 TEST_F(LorawanTest, downlink_handler_task_run_intervals1)
