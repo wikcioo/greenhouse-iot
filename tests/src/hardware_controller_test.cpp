@@ -13,7 +13,7 @@ extern range_t temp_range;
 extern range_t hum_range;
 extern range_t co2_range;
 
-extern bool water_valve_state;
+extern bool is_water_valve_open;
 
 extern time_point_t daily_time;
 extern time_point_t end_watering_time;
@@ -25,7 +25,6 @@ class HardwareControllerTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        // FreeRTOS fff's
         RESET_FAKE(xTaskCreate);
         RESET_FAKE(xMessageBufferReceive);
         RESET_FAKE(xMessageBufferSend);
@@ -117,7 +116,7 @@ TEST_F(HardwareControllerTest, hc_toggle_handler_task_run_water_off)
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(action_t));
 
-    ASSERT_EQ(water_valve_state, false);
+    ASSERT_EQ(is_water_valve_open, false);
 }
 
 TEST_F(HardwareControllerTest, hc_toggle_handler_task_run_water_on_keep_end_watering_time)
@@ -137,7 +136,7 @@ TEST_F(HardwareControllerTest, hc_toggle_handler_task_run_water_on_keep_end_wate
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(action_t));
 
-    ASSERT_EQ(water_valve_state, true);
+    ASSERT_EQ(is_water_valve_open, true);
     ASSERT_EQ(end_watering_time.hour, 5);
     ASSERT_EQ(end_watering_time.minute, 30);
 }
@@ -159,14 +158,14 @@ TEST_F(HardwareControllerTest, hc_toggle_handler_task_run_water_on_increment_end
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(action_t));
 
-    ASSERT_EQ(water_valve_state, true);
+    ASSERT_EQ(is_water_valve_open, true);
     ASSERT_EQ(end_watering_time.hour, 5);
     ASSERT_EQ(end_watering_time.minute, 40);
 }
 
 TEST_F(HardwareControllerTest, hc_handler_task_run1)
 {
-    hc_handler_task_run(5);
+    hc_measurement_handler_task_run(5);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferSend_fake.arg0_val, upLinkMessageBufferHandle);
@@ -176,21 +175,21 @@ TEST_F(HardwareControllerTest, hc_handler_task_run1)
 
 TEST_F(HardwareControllerTest, hc_handler_task_run2)
 {
-    hc_handler_task_run(0);
+    hc_measurement_handler_task_run(0);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
 }
 
 TEST_F(HardwareControllerTest, hc_handler_task_run3)
 {
-    hc_handler_task_run(4);
+    hc_measurement_handler_task_run(4);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
 }
 
 TEST_F(HardwareControllerTest, hc_handler_task_run4)
 {
-    hc_handler_task_run(6);
+    hc_measurement_handler_task_run(6);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
 }
