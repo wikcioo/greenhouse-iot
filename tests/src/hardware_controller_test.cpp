@@ -25,7 +25,6 @@ class HardwareControllerTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        // FreeRTOS fff's
         RESET_FAKE(xTaskCreate);
         RESET_FAKE(xMessageBufferReceive);
         RESET_FAKE(xMessageBufferSend);

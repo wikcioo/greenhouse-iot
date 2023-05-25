@@ -6,8 +6,6 @@
 
 #include "payload.h"
 
-#define BIT_0 (1 << 0)
-
 typedef struct
 {
     bool     is_water_valve_open;

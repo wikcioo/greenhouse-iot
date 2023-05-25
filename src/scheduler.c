@@ -6,7 +6,6 @@
 #include <timers.h>
 
 #include "logger.h"
-#include "payload.h"
 #include "water_controller.h"
 
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
@@ -19,7 +18,8 @@ extern time_point_t end_watering_time;
 void vTimerCallback(TimerHandle_t xTimer);
 
 static daily_time_interval_info_t _is_daily_time_in_interval_array();
-static void                       _debug_print_intervals();
+
+static void _debug_print_intervals();
 
 void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t scheduler_priority)
 {
@@ -158,7 +158,6 @@ void scheduler_schedule_events_handler_task(void *pvParameters)
     TimerHandle_t xTimer = xTimerCreate("MinuteTimer", pdMS_TO_TICKS(60000), pdTRUE, (void *) 0, vTimerCallback);
     xTimerStart(xTimer, 0);
 
-    // TODO: Get rid of 2500 ms delay and make printf use mutex
     vTaskDelay(pdMS_TO_TICKS(2500));
     _debug_print_intervals();
 

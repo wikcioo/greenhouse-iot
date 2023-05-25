@@ -48,6 +48,7 @@ void lora_uplink_handler_task_run(void)
 
     status_leds_shortPuls(led_ST4);
     char *result = lora_driver_mapReturnCodeToText(lora_driver_sendUploadMessage(false, &_uplink_payload));
+    (void) result;  // Prevents "unused variable" compiler warning if logging is disabled
     LOG("Upload Message >%s<\n", result);
 }
 
@@ -130,7 +131,7 @@ void lora_setup(void)
     char _out_buf[20];
 
     lora_driver_returnCode_t rc;
-    status_leds_slowBlink(led_ST2);  // OPTIONAL: Led the green led blink slowly while we are setting up LoRa
+    status_leds_slowBlink(led_ST2);
 
     // Factory reset the transceiver
     lora_driver_rn2483FactoryReset();

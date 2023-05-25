@@ -27,7 +27,6 @@ class WaterController : public ::testing::Test
     void TearDown() override {}
 };
 
-
 TEST_F(WaterController, water_controller_init)
 {
     water_controller_init();

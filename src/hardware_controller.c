@@ -66,7 +66,6 @@ void hc_receive_preset_data_handler_task_run(void)
 
 void hc_receive_preset_data_handler_task(void *pvParameters)
 {
-    // TODO: Replace delay with printf with mutexes
     vTaskDelay(pdMS_TO_TICKS(1500));
     _print_preset_data();
 
