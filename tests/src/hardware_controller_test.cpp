@@ -166,7 +166,7 @@ TEST_F(HardwareControllerTest, hc_toggle_handler_task_run_water_on_increment_end
 
 TEST_F(HardwareControllerTest, hc_handler_task_run1)
 {
-    hc_handler_task_run(5);
+    hc_measurement_handler_task_run(5);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferSend_fake.arg0_val, upLinkMessageBufferHandle);
@@ -176,21 +176,21 @@ TEST_F(HardwareControllerTest, hc_handler_task_run1)
 
 TEST_F(HardwareControllerTest, hc_handler_task_run2)
 {
-    hc_handler_task_run(0);
+    hc_measurement_handler_task_run(0);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
 }
 
 TEST_F(HardwareControllerTest, hc_handler_task_run3)
 {
-    hc_handler_task_run(4);
+    hc_measurement_handler_task_run(4);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
 }
 
 TEST_F(HardwareControllerTest, hc_handler_task_run4)
 {
-    hc_handler_task_run(6);
+    hc_measurement_handler_task_run(6);
 
     ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
 }

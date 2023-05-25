@@ -47,7 +47,8 @@ void hc_handler_initialise(
         hc_receive_preset_data_handler_task, "Preset Data Receiver", configMINIMAL_STACK_SIZE, NULL,
         preset_data_receive_priority, NULL);
     xTaskCreate(hc_toggle_handler_task, "Water Toggler", configMINIMAL_STACK_SIZE, NULL, toggle_priority, NULL);
-    xTaskCreate(hc_handler_task, "Hardware Controller", configMINIMAL_STACK_SIZE, NULL, measurement_priority, NULL);
+    xTaskCreate(
+        hc_measurement_handler_task, "Hardware Controller", configMINIMAL_STACK_SIZE, NULL, measurement_priority, NULL);
 }
 
 void hc_receive_preset_data_handler_task_run(void)
@@ -143,7 +144,7 @@ static void _handle_measurements_outside_range(uint16_t temp, uint16_t hum, uint
     _warn_if_measurement_outside_range("co2", co2, co2_range, led_ST2);
 }
 
-void hc_handler_task_run(uint8_t counter)
+void hc_measurement_handler_task_run(uint8_t counter)
 {
     co2_measure();
     hum_temp_measure();
@@ -166,7 +167,8 @@ void hc_handler_task_run(uint8_t counter)
         counter = 0;
     }
 }
-void hc_handler_task(void *pvParameters)
+
+void hc_measurement_handler_task(void *pvParameters)
 {
     TickType_t       xLastWakeTime = xTaskGetTickCount();
     const TickType_t xFrequency    = pdMS_TO_TICKS(60000UL);
@@ -176,7 +178,7 @@ void hc_handler_task(void *pvParameters)
     {
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
         counter++;
-        hc_handler_task_run(counter);
+        hc_measurement_handler_task_run(counter);
         if (counter == 5)
         {
             counter = 0;

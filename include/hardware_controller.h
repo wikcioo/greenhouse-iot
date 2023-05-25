@@ -23,11 +23,11 @@ typedef struct
     range_t *co2_range;
 } preset_data_t;
 
-void hc_receive_preset_data_handler_task(void *pvParameters);
-void hc_toggle_handler_task(void *pvParameters);
-void hc_handler_task(void *pvParameters);
 void hc_handler_initialise(
     UBaseType_t preset_data_receive_priority, UBaseType_t measurement_priority, UBaseType_t toggle_priority);
 void hc_receive_preset_data_handler_task_run(void);
+void hc_receive_preset_data_handler_task(void *pvParameters);
 void hc_toggle_handler_task_run(void);
-void hc_handler_task_run(uint8_t counter);
+void hc_toggle_handler_task(void *pvParameters);
+void hc_measurement_handler_task_run(uint8_t counter);
+void hc_measurement_handler_task(void *pvParameters);
