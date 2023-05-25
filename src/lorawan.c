@@ -84,13 +84,13 @@ void downlink_handler_task_run(void)
 
     LOG("DOWN LINK: from port: %d with %d bytes received!\n", downlinkPayload.portNo, downlinkPayload.len);
 
-    payload_id_t payload_id = payload_get_id_u8_ptr(downlinkPayload.bytes);
+    payload_id_t payload_id = payload_get_id(downlinkPayload.bytes);
     LOG("Payload name = %s\n", PAYLOAD_ID_TO_NAME(payload_id));
 
     if (payload_id == ACTIONS)
     {
         action_t action;
-        payload_unpack_actions_u8_ptr(downlinkPayload.bytes, &action);
+        payload_unpack_actions(downlinkPayload.bytes, &action);
 
         xMessageBufferSend(actionDataMessageBufferHandle, &action, sizeof(action_t), portMAX_DELAY);
     }
@@ -109,7 +109,7 @@ void downlink_handler_task_run(void)
     else if (payload_id == THC_PRESETS)
     {
         range_t temp_range, hum_range, co2_range;
-        payload_unpack_thc_presets_u8_ptr(downlinkPayload.bytes, &temp_range, &hum_range, &co2_range);
+        payload_unpack_thc_presets(downlinkPayload.bytes, &temp_range, &hum_range, &co2_range);
 
         preset_data_t data = {&temp_range, &hum_range, &co2_range};
         xMessageBufferSend(presetDataMessageBufferHandle, (void *) &data, sizeof(preset_data_t), portMAX_DELAY);
