@@ -2,7 +2,7 @@
 
 #include <rc_servo.h>
 
-bool water_valve_state;
+bool is_water_valve_open;
 
 void water_controller_init()
 {
@@ -15,16 +15,16 @@ void water_controller_init()
 void water_controller_on()
 {
     rc_servo_setPosition(1, 100);
-    water_valve_state = true;
+    is_water_valve_open = true;
 }
 
 void water_controller_off()
 {
     rc_servo_setPosition(1, 0);
-    water_valve_state = false;
+    is_water_valve_open = false;
 }
 
-bool water_controller_get_state()
+bool water_controller_is_water_valve_open()
 {
-    return water_valve_state;
+    return is_water_valve_open;
 }

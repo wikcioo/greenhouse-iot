@@ -5,4 +5,4 @@
 void water_controller_init();
 void water_controller_on();
 void water_controller_off();
-bool water_controller_get_state();
+bool water_controller_is_water_valve_open();
