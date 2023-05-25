@@ -19,11 +19,12 @@ extern MessageBufferHandle_t actionDataMessageBufferHandle;
 
 void lora_handler_initialise(UBaseType_t uplink_priority, UBaseType_t downlink_priority)
 {
-    xTaskCreate(uplink_handler_task, "LRUpLink", configMINIMAL_STACK_SIZE + 200, NULL, uplink_priority, NULL);
-    xTaskCreate(downlink_handler_task, "LRDownLink", configMINIMAL_STACK_SIZE + 200, NULL, downlink_priority, NULL);
+    xTaskCreate(lora_uplink_handler_task, "LRUpLink", configMINIMAL_STACK_SIZE + 200, NULL, uplink_priority, NULL);
+    xTaskCreate(
+        lora_downlink_handler_task, "LRDownLink", configMINIMAL_STACK_SIZE + 200, NULL, downlink_priority, NULL);
 }
 
-void uplink_handler_task_run(void)
+void lora_uplink_handler_task_run(void)
 {
     sensor_data_t data;
     xMessageBufferReceive(upLinkMessageBufferHandle, &data, sizeof(sensor_data_t), portMAX_DELAY);
@@ -50,7 +51,7 @@ void uplink_handler_task_run(void)
     LOG("Upload Message >%s<\n", result);
 }
 
-void uplink_handler_task(void *pvParameters)
+void lora_uplink_handler_task(void *pvParameters)
 {
     lora_driver_resetRn2483(1);
     vTaskDelay(2);
@@ -62,7 +63,7 @@ void uplink_handler_task(void *pvParameters)
 
     for (;;)
     {
-        uplink_handler_task_run();
+        lora_uplink_handler_task_run();
     }
 }
 
@@ -76,7 +77,7 @@ void send_intervals_to_scheduler(lora_driver_payload_t *downlinkPayload)
     }
 }
 
-void downlink_handler_task_run(void)
+void lora_downlink_handler_task_run(void)
 {
     lora_driver_payload_t downlinkPayload;
 
@@ -116,11 +117,11 @@ void downlink_handler_task_run(void)
     }
 }
 
-void downlink_handler_task(void *pvParameters)
+void lora_downlink_handler_task(void *pvParameters)
 {
     for (;;)
     {
-        downlink_handler_task_run();
+        lora_downlink_handler_task_run();
     }
 }
 

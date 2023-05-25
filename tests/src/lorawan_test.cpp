@@ -125,7 +125,7 @@ TEST_F(LorawanTest, downlink_handler_task_run_actions)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
@@ -146,7 +146,7 @@ TEST_F(LorawanTest, downlink_handler_task_run_intervals1)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
     // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
@@ -170,7 +170,7 @@ TEST_F(LorawanTest, downlink_handler_task_run_intervals2)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
     // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
@@ -194,7 +194,7 @@ TEST_F(LorawanTest, downlink_handler_task_run_thc_presets)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
     // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
@@ -235,7 +235,7 @@ TEST_F(LorawanTest, uplink_handler_task_run)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_uplink_xMessageBufferReceiveCustomFake;
 
-    uplink_handler_task_run();
+    lora_uplink_handler_task_run();
 
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, upLinkMessageBufferHandle);
