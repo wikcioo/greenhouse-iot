@@ -45,7 +45,7 @@ jobs:
           args: -rlgoDzvc -i
           SCRIPT_BEFORE: |
             mkdir -p ~/release/${{ steps.date.outputs.date }}
-          SCRIPT_AFTER: >
+          SCRIPT_AFTER: |
             rm -v ~/latest/*
             cp  ~/release/${{ steps.date.outputs.date }}/iot_firmware.hex ~/latest
             echo ${{ secrets.PASSWORD }} | sudo -S ./flash-latest-hex.sh
