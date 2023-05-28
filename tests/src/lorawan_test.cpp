@@ -84,7 +84,7 @@ TEST_F(LorawanTest, lora_handler_initialise)
     ASSERT_EQ(xTaskCreate_fake.call_count, 2);
 }
 
-TEST_F(LorawanTest, lora_setup)
+TEST_F(LorawanTest, lora_setup_accepted)
 {
     lora_driver_join_fake.return_val = LORA_ACCEPTED;
 
@@ -101,6 +101,26 @@ TEST_F(LorawanTest, lora_setup)
     ASSERT_EQ(lora_driver_setReceiveDelay_fake.call_count, 1);
     ASSERT_EQ(status_leds_longPuls_fake.call_count, 0);
     ASSERT_EQ(status_leds_ledOn_fake.call_count, 1);
+}
+
+TEST_F(LorawanTest, lora_setup_rejected)
+{
+    lora_driver_join_fake.return_val = LORA_DENIED;
+
+    lora_setup();
+
+    ASSERT_EQ(status_leds_slowBlink_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_rn2483FactoryReset_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_configureToEu868_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_getRn2483Hweui_fake.call_count, 0);
+    ASSERT_EQ(lora_driver_setDeviceIdentifier_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_setOtaaIdentity_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_saveMac_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_setAdaptiveDataRate_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_setReceiveDelay_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_join_fake.call_count, 10);
+    ASSERT_EQ(status_leds_ledOff_fake.call_count, 1);
+    ASSERT_EQ(status_leds_fastBlink_fake.call_count, 1);
 }
 
 lora_driver_payload_t example_downlinkPayload;
