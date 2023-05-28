@@ -39,7 +39,7 @@ typedef struct
 typedef struct
 {
     bool     water_on;
-    uint16_t interval;
+    uint16_t duration;
 } action_t;
 
 typedef struct
@@ -48,12 +48,9 @@ typedef struct
     time_point_t end;
 } interval_t;
 
-payload_id_t     payload_get_id_u8_ptr(uint8_t *data);
-payload_id_t     payload_get_id(const char *hex_str);
+payload_id_t     payload_get_id(uint8_t *data);
 payload_uplink_t payload_pack_thc(uint8_t flags, int16_t temperature, uint16_t humidity, uint16_t co2);
 
-void payload_unpack_thc_presets(const char *hex_str, range_t *temp_range, range_t *hum_range, range_t *co2_range);
-void payload_unpack_thc_presets_u8_ptr(uint8_t *data, range_t *temp_range, range_t *hum_range, range_t *co2_range);
-void payload_unpack_actions(const char *hex_str, action_t *actions);
-void payload_unpack_actions_u8_ptr(uint8_t *data, action_t *actions);
+void payload_unpack_thc_presets(uint8_t *data, range_t *temp_range, range_t *hum_range, range_t *co2_range);
+void payload_unpack_actions(uint8_t *data, action_t *actions);
 void payload_unpack_intervals(uint8_t *data, uint8_t length, interval_t *intervals);

@@ -15,14 +15,14 @@ TEST(payload, UnpackingActions)
     // Result bin = 0b0001_0110_0000_0000_0000_1111 (24 bits = 3 bytes)
     // Result hex = 0x16000F
 
-    const char *hex_str = "16000F";
-    action_t    actions = {};
+    uint8_t  data[]  = {0x16, 0x00, 0x0F};
+    action_t actions = {};
 
-    payload_unpack_actions(hex_str, &actions);
-    EXPECT_EQ(payload_get_id(hex_str), ACTIONS);
+    payload_unpack_actions(data, &actions);
+    EXPECT_EQ(payload_get_id(data), ACTIONS);
 
     EXPECT_EQ(actions.water_on, true);
-    EXPECT_EQ(actions.interval, 15);
+    EXPECT_EQ(actions.duration, 15);
 }
 
 TEST(payload, PackingLowerBounds)
@@ -122,15 +122,14 @@ TEST(payload, UnpackingLowerBounds)
     // Concatenated 000 100 00 000 000 000 00 000 000 000 0 000 000 0 000 000 000 000 000 000 000 000 000 000 000000
     // -> 72 bits -> 100000000000000000
 
-    const char *hex_str = "100000000000000000";
-    range_t     temp_range;
-    range_t     hum_range;
-    range_t     co2_range;
+    uint8_t data[] = {0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
 
-    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+    payload_unpack_thc_presets(data, &temp_range, &hum_range, &co2_range);
 
-
-    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+    EXPECT_EQ(payload_get_id(data), THC_PRESETS);
 
     EXPECT_EQ(temp_range.low, 0);
     EXPECT_EQ(temp_range.high, 0);
@@ -159,14 +158,14 @@ TEST(payload, UnpackingNormalValues)
     // Concatenated 000 100 01 010 001 111 01 110 110 110 0 010 100 1 010 000 0 000 111 110 100 0 011 111 010 000 + 0000
     // -> 72 bits -> 1147BB629403E87D00
 
-    const char *hex_str = "1147BB629403E87D00";
-    range_t     temp_range;
-    range_t     hum_range;
-    range_t     co2_range;
+    uint8_t data[] = {0x11, 0x47, 0xBB, 0x62, 0x94, 0x03, 0xE8, 0x7D, 0x00};
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
 
-    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+    payload_unpack_thc_presets(data, &temp_range, &hum_range, &co2_range);
 
-    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+    EXPECT_EQ(payload_get_id(data), THC_PRESETS);
 
     EXPECT_EQ(temp_range.low, 655);
     EXPECT_EQ(temp_range.high, 950);
@@ -195,14 +194,14 @@ TEST(payload, UnpackingNormalValues2)
     // Concatenated 000 100 00 111 111 001 10 111 010 111 0 000 101 1 011 111 0 000 000 000 101 1 111 111 111 110 + 0000
     // -> 72 bits -> 10FCDD70B7C00BFFE0
 
-    const char *hex_str = "10FCDD70B7C00BFFE0";
-    range_t     temp_range;
-    range_t     hum_range;
-    range_t     co2_range;
+    uint8_t data[] = {0x10, 0xFC, 0xDD, 0x70, 0xB7, 0xC0, 0x0B, 0xFF, 0xE0};
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
 
-    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+    payload_unpack_thc_presets(data, &temp_range, &hum_range, &co2_range);
 
-    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+    EXPECT_EQ(payload_get_id(data), THC_PRESETS);
 
     EXPECT_EQ(temp_range.low, 505);
     EXPECT_EQ(temp_range.high, 1495);
@@ -231,14 +230,14 @@ TEST(payload, UnpackingUpperBounds)
     // Concatenated 000 100 10 001 001 100 10 001 001 100 1 100 100 1 100 100 1 111 111 111 111 1 111 111 111 111 + 0000
     // -> 72 bits -> 122644CC993FFFFFF0
 
-    const char *hex_str = "122644CC993FFFFFF0";
-    range_t     temp_range;
-    range_t     hum_range;
-    range_t     co2_range;
+    uint8_t data[] = {0x12, 0x26, 0x44, 0xCC, 0x99, 0x3F, 0xFF, 0xFF, 0xF0};
+    range_t temp_range;
+    range_t hum_range;
+    range_t co2_range;
 
-    payload_unpack_thc_presets(hex_str, &temp_range, &hum_range, &co2_range);
+    payload_unpack_thc_presets(data, &temp_range, &hum_range, &co2_range);
 
-    EXPECT_EQ(payload_get_id(hex_str), THC_PRESETS);
+    EXPECT_EQ(payload_get_id(data), THC_PRESETS);
 
     EXPECT_EQ(temp_range.low, 1100);
     EXPECT_EQ(temp_range.high, 1100);
@@ -257,7 +256,7 @@ TEST(payload, UnpackingIntervals0)
     uint8_t    length       = 1;
     interval_t intervals[7] = {0};
 
-    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS_APPEND);
+    EXPECT_EQ(payload_get_id(data), INTERVALS_APPEND);
     payload_unpack_intervals(data, length, intervals);
 
     EXPECT_EQ(intervals[0].start.hour, 0);
@@ -274,7 +273,7 @@ TEST(payload, UnpackingIntervals1)
     uint8_t    length       = 7;
     interval_t intervals[7] = {0};
 
-    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS_APPEND);
+    EXPECT_EQ(payload_get_id(data), INTERVALS_APPEND);
     payload_unpack_intervals(data, length, intervals);
 
     EXPECT_EQ(intervals[0].start.hour, 12);
@@ -291,7 +290,7 @@ TEST(payload, UnpackingIntervals7)
     uint8_t    length       = 20;
     interval_t intervals[7] = {0};
 
-    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS_APPEND);
+    EXPECT_EQ(payload_get_id(data), INTERVALS_APPEND);
     payload_unpack_intervals(data, length, intervals);
 
     //  [0]: 18:30 -> 19:02
@@ -346,7 +345,7 @@ TEST(payload, UnpackingMaxIntervals)
     interval_t intervals[7] = {0};
 
     payload_unpack_intervals(data, length, intervals);
-    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS_APPEND);
+    EXPECT_EQ(payload_get_id(data), INTERVALS_APPEND);
 
     // [0]: 31:63 -> 31:61
     EXPECT_EQ(intervals[0].start.hour, 31);
@@ -412,7 +411,7 @@ TEST(payload, UnpackingEmptyIntervals)
     intervals[0].end.minute   = 13;
 
     payload_unpack_intervals(data, length, intervals);
-    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS_APPEND);
+    EXPECT_EQ(payload_get_id(data), INTERVALS_APPEND);
 
     // [0]: 0:00 -> 0:00
     EXPECT_EQ(intervals[0].start.hour, 0);
@@ -424,5 +423,5 @@ TEST(payload, UnpackingEmptyIntervals)
 TEST(payload, GettingIdOfPayloadForIntervalsWithClearAndAppend)
 {
     uint8_t data[] = {0x0C};
-    EXPECT_EQ(payload_get_id_u8_ptr(data), INTERVALS_CLS_APPEND);
+    EXPECT_EQ(payload_get_id(data), INTERVALS_CLS_APPEND);
 }

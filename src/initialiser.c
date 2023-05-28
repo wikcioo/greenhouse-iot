@@ -21,7 +21,11 @@ MessageBufferHandle_t intervalDataMessageBufferHandle;
 MessageBufferHandle_t upLinkMessageBufferHandle;
 MessageBufferHandle_t downLinkMessageBufferHandle;
 MessageBufferHandle_t presetDataMessageBufferHandle;
-EventGroupHandle_t    xCreatedEventGroup;
+MessageBufferHandle_t actionDataMessageBufferHandle;
+
+#ifdef ENABLE_DEBUG_PRINT
+SemaphoreHandle_t loggerMutex;
+#endif
 
 void initialiseSystem()
 {
@@ -34,7 +38,11 @@ void initialiseSystem()
     downLinkMessageBufferHandle     = xMessageBufferCreate(sizeof(lora_driver_payload_t) * 2);
     upLinkMessageBufferHandle       = xMessageBufferCreate(sizeof(sensor_data_t) * 2);
     presetDataMessageBufferHandle   = xMessageBufferCreate(sizeof(preset_data_t) * 2);
-    xCreatedEventGroup              = xEventGroupCreate();
+    actionDataMessageBufferHandle   = xMessageBufferCreate(sizeof(action_t) * 2);
+
+#ifdef ENABLE_DEBUG_PRINT
+    loggerMutex = xSemaphoreCreateMutex();
+#endif
 
     if (hum_temp_init())
     {

@@ -12,11 +12,14 @@
 
 extern MessageBufferHandle_t upLinkMessageBufferHandle;
 extern MessageBufferHandle_t presetDataMessageBufferHandle;
-extern EventGroupHandle_t    xCreatedEventGroup;
+extern MessageBufferHandle_t actionDataMessageBufferHandle;
 
 range_t temp_range;
 range_t hum_range;
 range_t co2_range;
+
+extern time_point_t daily_time;
+time_point_t        end_watering_time;
 
 static void _print_preset_data()
 {
@@ -44,7 +47,8 @@ void hc_handler_initialise(
         hc_receive_preset_data_handler_task, "Preset Data Receiver", configMINIMAL_STACK_SIZE, NULL,
         preset_data_receive_priority, NULL);
     xTaskCreate(hc_toggle_handler_task, "Water Toggler", configMINIMAL_STACK_SIZE, NULL, toggle_priority, NULL);
-    xTaskCreate(hc_handler_task, "Hardware Controller", configMINIMAL_STACK_SIZE, NULL, measurement_priority, NULL);
+    xTaskCreate(
+        hc_measurement_handler_task, "Hardware Controller", configMINIMAL_STACK_SIZE, NULL, measurement_priority, NULL);
 }
 
 void hc_receive_preset_data_handler_task_run(void)
@@ -62,7 +66,6 @@ void hc_receive_preset_data_handler_task_run(void)
 
 void hc_receive_preset_data_handler_task(void *pvParameters)
 {
-    // TODO: Replace delay with printf with mutexes
     vTaskDelay(pdMS_TO_TICKS(1500));
     _print_preset_data();
 
@@ -74,15 +77,31 @@ void hc_receive_preset_data_handler_task(void *pvParameters)
 
 void hc_toggle_handler_task_run(void)
 {
-    xEventGroupWaitBits(xCreatedEventGroup, BIT_0, pdTRUE, pdFALSE, portMAX_DELAY);
-    LOG("Toggling water with event groups\n");
-    if (water_controller_get_state())
+    action_t received_action;
+    xMessageBufferReceive(actionDataMessageBufferHandle, &received_action, sizeof(action_t), portMAX_DELAY);
+
+    LOG("Received action {\n\twater_on: %s\n\tduration: %u\n}\n", received_action.water_on ? "true" : "false",
+        received_action.duration);
+
+    if (received_action.water_on)
     {
-        water_controller_off();
+        time_point_t new_end_time = time_add_minutes(daily_time, received_action.duration);
+        if (!time_is_before(&new_end_time, &end_watering_time))
+        {
+            end_watering_time = new_end_time;
+        }
+
+        if (time_is_before(&daily_time, &end_watering_time))
+        {
+            water_controller_on();
+        }
     }
     else
     {
-        water_controller_on();
+        if (!time_is_before(&daily_time, &end_watering_time))
+        {
+            water_controller_off();
+        }
     }
 }
 
@@ -96,6 +115,9 @@ void hc_toggle_handler_task(void *pvParameters)
 
 static void _warn_if_measurement_outside_range(const char *name, uint16_t measurement, range_t range, status_leds_t led)
 {
+    if (range.low == 0 && range.high == 0)
+        return;
+
     if (measurement < range.low || measurement > range.high)
     {
         LOG("[warning]: %s measurement (%u) is outside of range [%u, %u]\n", name, measurement, range.low, range.high);
@@ -121,7 +143,7 @@ static void _handle_measurements_outside_range(uint16_t temp, uint16_t hum, uint
     _warn_if_measurement_outside_range("co2", co2, co2_range, led_ST2);
 }
 
-void hc_handler_task_run(uint8_t counter)
+void hc_measurement_handler_task_run(uint8_t counter)
 {
     co2_measure();
     hum_temp_measure();
@@ -136,7 +158,7 @@ void hc_handler_task_run(uint8_t counter)
 
     if (counter == 5)
     {
-        sensor_data_t data = {water_controller_get_state(), temp, hum, co2};
+        sensor_data_t data = {water_controller_is_water_valve_open(), temp, hum, co2};
 
         // TODO: Add error handling
         xMessageBufferSend(upLinkMessageBufferHandle, (void *) &data, sizeof(sensor_data_t), portMAX_DELAY);
@@ -144,7 +166,8 @@ void hc_handler_task_run(uint8_t counter)
         counter = 0;
     }
 }
-void hc_handler_task(void *pvParameters)
+
+void hc_measurement_handler_task(void *pvParameters)
 {
     TickType_t       xLastWakeTime = xTaskGetTickCount();
     const TickType_t xFrequency    = pdMS_TO_TICKS(60000UL);
@@ -154,7 +177,7 @@ void hc_handler_task(void *pvParameters)
     {
         xTaskDelayUntil(&xLastWakeTime, xFrequency);
         counter++;
-        hc_handler_task_run(counter);
+        hc_measurement_handler_task_run(counter);
         if (counter == 5)
         {
             counter = 0;

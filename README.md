@@ -97,3 +97,14 @@ For reading from the device, there are 2 recommendations:
 - **LINUX**: Minicom
 
 Make sure to set **baudrate** to **57600** and **implicit CR in every LF** to **true** (or **Add carriage return** for minicom).
+
+# Test coverage
+
+This section describes how you can generate the test coverage for the project locally.
+Test coverage for ```master``` is always available at [projects' GitHub Pages page](https://wikcioo.github.io/greenhouse-iot/).
+
+> Generating coverage requires configured environment
+
+1. Change into project root directory
+2. Run ```./coverage.sh```
+3. Once the script is finished, coverage is available under ```{project_root}/tests/coverage/index.html```

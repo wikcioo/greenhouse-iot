@@ -160,3 +160,53 @@ TEST(time_point, DiffUntilMidnight2)
 
     EXPECT_EQ(result, 1124);
 }
+
+TEST(time_point, AddMinutesSameHour)
+{
+    time_point_t time = {.hour = 5, .minute = 10};
+
+    time_point_t new_time = time_add_minutes(time, 10);
+
+    EXPECT_EQ(new_time.hour, 5);
+    EXPECT_EQ(new_time.minute, 20);
+}
+
+TEST(time_point, AddMinutesNextHour)
+{
+    time_point_t time = {.hour = 5, .minute = 10};
+
+    time_point_t new_time = time_add_minutes(time, 60);
+
+    EXPECT_EQ(new_time.hour, 6);
+    EXPECT_EQ(new_time.minute, 10);
+}
+
+TEST(time_point, AddMinutesSecondNextHour)
+{
+    time_point_t time = {.hour = 5, .minute = 10};
+
+    time_point_t new_time = time_add_minutes(time, 120);
+
+    EXPECT_EQ(new_time.hour, 7);
+    EXPECT_EQ(new_time.minute, 10);
+}
+
+TEST(time_point, TimeEqual)
+{
+    time_point_t t1 = {.hour = 5, .minute = 10};
+    time_point_t t2 = {.hour = 5, .minute = 10};
+
+    bool result = time_equals(&t1, &t2);
+
+    EXPECT_EQ(result, true);
+}
+
+TEST(time_point, TimeNotEqual)
+{
+    time_point_t t1 = {.hour = 5, .minute = 10};
+    time_point_t t2 = {.hour = 5, .minute = 11};
+
+    bool result = time_equals(&t1, &t2);
+
+    EXPECT_EQ(result, false);
+}

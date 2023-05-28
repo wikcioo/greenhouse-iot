@@ -18,7 +18,7 @@ MessageBufferHandle_t upLinkMessageBufferHandle;
 MessageBufferHandle_t downLinkMessageBufferHandle;
 MessageBufferHandle_t intervalDataMessageBufferHandle;
 MessageBufferHandle_t presetDataMessageBufferHandle;
-EventGroupHandle_t    xCreatedEventGroup;
+MessageBufferHandle_t actionDataMessageBufferHandle;
 
 FAKE_VOID_FUNC(lora_driver_resetRn2483, uint8_t);
 FAKE_VOID_FUNC(lora_driver_flushBuffers);
@@ -84,7 +84,7 @@ TEST_F(LorawanTest, lora_handler_initialise)
     ASSERT_EQ(xTaskCreate_fake.call_count, 2);
 }
 
-TEST_F(LorawanTest, lora_setup)
+TEST_F(LorawanTest, lora_setup_accepted)
 {
     lora_driver_join_fake.return_val = LORA_ACCEPTED;
 
@@ -93,7 +93,7 @@ TEST_F(LorawanTest, lora_setup)
     ASSERT_EQ(status_leds_slowBlink_fake.call_count, 1);
     ASSERT_EQ(lora_driver_rn2483FactoryReset_fake.call_count, 1);
     ASSERT_EQ(lora_driver_configureToEu868_fake.call_count, 1);
-    ASSERT_EQ(lora_driver_getRn2483Hweui_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_getRn2483Hweui_fake.call_count, 0);
     ASSERT_EQ(lora_driver_setDeviceIdentifier_fake.call_count, 1);
     ASSERT_EQ(lora_driver_setOtaaIdentity_fake.call_count, 1);
     ASSERT_EQ(lora_driver_saveMac_fake.call_count, 1);
@@ -103,7 +103,25 @@ TEST_F(LorawanTest, lora_setup)
     ASSERT_EQ(status_leds_ledOn_fake.call_count, 1);
 }
 
-// *** DOWNLINK TESTS ***
+TEST_F(LorawanTest, lora_setup_rejected)
+{
+    lora_driver_join_fake.return_val = LORA_DENIED;
+
+    lora_setup();
+
+    ASSERT_EQ(status_leds_slowBlink_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_rn2483FactoryReset_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_configureToEu868_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_getRn2483Hweui_fake.call_count, 0);
+    ASSERT_EQ(lora_driver_setDeviceIdentifier_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_setOtaaIdentity_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_saveMac_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_setAdaptiveDataRate_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_setReceiveDelay_fake.call_count, 1);
+    ASSERT_EQ(lora_driver_join_fake.call_count, 10);
+    ASSERT_EQ(status_leds_ledOff_fake.call_count, 1);
+    ASSERT_EQ(status_leds_fastBlink_fake.call_count, 1);
+}
 
 lora_driver_payload_t example_downlinkPayload;
 
@@ -125,19 +143,17 @@ TEST_F(LorawanTest, downlink_handler_task_run_actions)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
-    // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
     ASSERT_EQ(xMessageBufferReceive_fake.arg3_val, portMAX_DELAY);
 
-    ASSERT_EQ(xEventGroupSetBits_fake.call_count, 1);
-    ASSERT_EQ(xEventGroupSetBits_fake.arg0_val, xCreatedEventGroup);
-    ASSERT_EQ(xEventGroupSetBits_fake.arg1_val, BIT_0);
-
-    ASSERT_EQ(xMessageBufferSend_fake.call_count, 0);
+    ASSERT_EQ(xMessageBufferSend_fake.call_count, 1);
+    ASSERT_EQ(xMessageBufferSend_fake.arg0_val, actionDataMessageBufferHandle);
+    ASSERT_EQ(xMessageBufferSend_fake.arg2_val, sizeof(action_t));
+    ASSERT_EQ(xMessageBufferSend_fake.arg3_val, portMAX_DELAY);
 }
 
 TEST_F(LorawanTest, downlink_handler_task_run_intervals1)
@@ -148,9 +164,8 @@ TEST_F(LorawanTest, downlink_handler_task_run_intervals1)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
-    // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
@@ -172,9 +187,8 @@ TEST_F(LorawanTest, downlink_handler_task_run_intervals2)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
-    // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
@@ -196,9 +210,8 @@ TEST_F(LorawanTest, downlink_handler_task_run_thc_presets)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_downlink_xMessageBufferReceiveCustomFake;
 
-    downlink_handler_task_run();
+    lora_downlink_handler_task_run();
 
-    // First xMessageBufferReceive
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, downLinkMessageBufferHandle);
     ASSERT_EQ(xMessageBufferReceive_fake.arg2_val, sizeof(lora_driver_payload_t));
@@ -211,10 +224,6 @@ TEST_F(LorawanTest, downlink_handler_task_run_thc_presets)
     ASSERT_EQ(xMessageBufferSend_fake.arg2_val, sizeof(preset_data_t));
     ASSERT_EQ(xMessageBufferSend_fake.arg3_val, portMAX_DELAY);
 }
-
-// =========
-
-// *** UPLINK TESTS ***
 
 sensor_data_t example_uplinkPayload;
 
@@ -237,7 +246,7 @@ TEST_F(LorawanTest, uplink_handler_task_run)
 
     xMessageBufferReceive_fake.custom_fake = lorawan_uplink_xMessageBufferReceiveCustomFake;
 
-    uplink_handler_task_run();
+    lora_uplink_handler_task_run();
 
     ASSERT_EQ(xMessageBufferReceive_fake.call_count, 1);
     ASSERT_EQ(xMessageBufferReceive_fake.arg0_val, upLinkMessageBufferHandle);
