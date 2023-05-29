@@ -30,19 +30,6 @@ static void _print_preset_data()
 void hc_handler_initialise(
     UBaseType_t preset_data_receive_priority, UBaseType_t measurement_priority, UBaseType_t toggle_priority)
 {
-#ifndef TEST_ENV
-    /* ======= For testing purposes only ======= */
-    temp_range.low  = 700;
-    temp_range.high = 820;
-
-    hum_range.low  = 200;
-    hum_range.high = 700;
-
-    co2_range.low  = 200;
-    co2_range.high = 1500;
-    /* ========================================= */
-#endif
-
     xTaskCreate(
         hc_receive_preset_data_handler_task, "Preset Data Receiver", configMINIMAL_STACK_SIZE, NULL,
         preset_data_receive_priority, NULL);

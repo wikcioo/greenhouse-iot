@@ -23,17 +23,6 @@ static void _debug_print_intervals();
 
 void scheduler_handler_initialise(UBaseType_t data_receive_priority, UBaseType_t scheduler_priority)
 {
-#ifndef TEST_ENV
-    /* ======= For testing purposes only ======= */
-    daily_time.hour   = 5;
-    daily_time.minute = 10;
-
-    interval_t temp_interval = {.start = {.hour = 5, .minute = 11}, .end = {.hour = 5, .minute = 16}};
-
-    interval_info.intervals[interval_info.current_size++] = temp_interval;
-    /* ========================================= */
-#endif
-
     xTaskCreate(
         scheduler_receive_data_handler_task, "Scheduler Data Receiver", configMINIMAL_STACK_SIZE, NULL,
         data_receive_priority, NULL);
