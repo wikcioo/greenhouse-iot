@@ -11,11 +11,12 @@
 extern MessageBufferHandle_t intervalDataMessageBufferHandle;
 extern MessageBufferHandle_t actionDataMessageBufferHandle;
 
+TimerHandle_t       minute_timer;
 interval_info_t     interval_info = {.intervals = {0}, .current_size = 0};
 time_point_t        daily_time    = {0, 0};
 extern time_point_t end_watering_time;
 
-void vTimerCallback(TimerHandle_t xTimer);
+void vTimerCallback(TimerHandle_t _xTimer);
 
 static daily_time_interval_info_t _is_daily_time_in_interval_array();
 
@@ -46,6 +47,12 @@ void scheduler_receive_data_handler_task_run(void)
     else
     {
         interval_info.intervals[interval_info.current_size++] = data;
+        // Reset daily time and minute timer when we get the first interval of the day
+        if (interval_info.current_size == 1)
+        {
+            daily_time = (time_point_t){0, 0};
+            xTimerReset(minute_timer, 10);
+        }
     }
 }
 
@@ -144,8 +151,8 @@ void scheduler_schedule_events_handler_task_run(void)
 
 void scheduler_schedule_events_handler_task(void *pvParameters)
 {
-    TimerHandle_t xTimer = xTimerCreate("MinuteTimer", pdMS_TO_TICKS(60000), pdTRUE, (void *) 0, vTimerCallback);
-    xTimerStart(xTimer, 0);
+    minute_timer = xTimerCreate("MinuteTimer", pdMS_TO_TICKS(60000), pdTRUE, (void *) 0, vTimerCallback);
+    xTimerStart(minute_timer, 0);
 
     vTaskDelay(pdMS_TO_TICKS(2500));
     _debug_print_intervals();
@@ -156,7 +163,7 @@ void scheduler_schedule_events_handler_task(void *pvParameters)
     }
 }
 
-void vTimerCallback(TimerHandle_t xTimer)
+void vTimerCallback(TimerHandle_t _xTimer)
 {
     daily_time.minute++;
 
